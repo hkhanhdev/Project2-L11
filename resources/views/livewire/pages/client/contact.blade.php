@@ -12,7 +12,7 @@ class extends Component {
 
     public function sendMessage()
     {
-        $this->success("Sent contact information successfully","We'll contact you ASAP!",timeout: 4000, position: 'toast-bottom');
+        $this->success("Sent contact information successfully","We'll contact you ASAP!",timeout: 4000, position: 'toast-top toast-end');
     }
     public function Home()
     {
