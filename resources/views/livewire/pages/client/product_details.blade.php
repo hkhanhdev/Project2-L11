@@ -20,7 +20,7 @@ class extends Component {
 <div class="flex flex-col items-center">
     <livewire:partials.header/>
     <x-gap/>
-    <livewire:partials.bread-crumb display="{{$full_location['display']}}" route="{{$full_location['route']}}" icon_name="{{$full_location['icon_name']}}"/>
+    <livewire:partials.bread-crumb display="{{$full_location['display']}}" route="{{$full_location['route']}}" icon_name="{{$full_location['icon_name']}}" product_id="{{$prd_id}}"/>
     <x-gap/>
     <livewire:partials.product :prd_id="$prd_id"/>
     <x-gap/>

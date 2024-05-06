@@ -7,6 +7,7 @@ new class extends Component {
     public $display;
     public $route;
     public $icon_name;
+    public $product_id;
     public function with():array
     {
 //        $this->display = $this->full_location['display'];
@@ -33,5 +34,12 @@ new class extends Component {
                 <a href="/{{$route}}">{{$display}}</a>
             </span>
         </li>
+        @if(isset($product_id))
+        <li>
+            <span class="inline-flex gap-2 items-center">
+                <a>#00{{$product_id}}</a>
+            </span>
+        </li>
+        @endif
     </ul>
 </div>

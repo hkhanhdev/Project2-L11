@@ -158,7 +158,7 @@ new class extends Component {
                 </tr>
                 <tr>
                     <th>Price</th>
-                    <td>{{$product->price}}</td>
+                    <td>${{$product->price}}</td>
                 </tr>
                 <tr>
                     <th>Rate</th>
@@ -170,7 +170,7 @@ new class extends Component {
             </table>
         </div>
         <div class="shadow-sm p-6">
-            <h3 class="text-lg font-bold text-[#333]">Reviews(10)</h3>
+            <h3 class="text-lg font-bold text-[#333]">Reviews(50)</h3>
             <div class="grid md:grid-cols-2 gap-12 mt-6">
                 <div>
                     <div class="space-y-3">
@@ -183,7 +183,7 @@ new class extends Component {
                             <div class="bg-gray-400 rounded w-full h-2 ml-3">
                                 <div class="w-2/3 h-full rounded bg-[#333]"></div>
                             </div>
-                            <p class="text-sm text-[#333] font-bold ml-3">66%</p>
+                            <p class="text-sm text-[#333] font-bold ml-3">69%</p>
                         </div>
                         <div class="flex items-center">
                             <p class="text-sm text-[#333] font-bold">4.0</p>
