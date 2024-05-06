@@ -5,28 +5,33 @@ use Livewire\Volt\Component;
 new class extends Component {
     use \Livewire\WithPagination, \Livewire\WithoutUrlPagination,\Mary\Traits\Toast;
 
-    protected $listeners = ['apply_search'];
+    protected $listeners = ['apply_search','apply_reset'];
 
     public $filtered = [];
 
+    public function apply_reset()
+    {
+        $this->reset();
+    }
     public function get_products($query)
     {
         $products_query = \App\Models\Products::query();
         // Apply filters if the $filters array is not null
         if ($query !== null) {
             foreach ($query as $key => $value) {
-                if ($value === null || !in_array($key, ['name', 'brand_id', 'cate_id'])) {
-                    continue;
+                if ($key == 'name') {
+                    $products_query->where($key, 'like', '%' . $value . '%');
+                }else {
+                    $products_query->where($key, 'like',$value);
                 }
-                $products_query->where($key, 'like', '%' . $value . '%');
             }
         }
         return $products_query->paginate(10);
     }
     public function apply_search($query)
     {
+        $this->reset();
         $this->filtered = $query;
-//        dd($this->filtered);
     }
     public function with():array
     {

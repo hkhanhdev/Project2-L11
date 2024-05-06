@@ -16,6 +16,7 @@ class extends Component {
     public function reset_search(): void
     {
         $this->reset();
+        $this->dispatch("apply_reset");
     }
     public function search()
     {
