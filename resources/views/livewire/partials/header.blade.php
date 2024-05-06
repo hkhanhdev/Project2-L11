@@ -11,16 +11,21 @@ new class extends Component {
 
     public function getCartInfo()
     {
-        $cus_id = auth()->user()->id;
-        // Check if an order exists for the customer
-        $order = \App\Models\Orders::where('customer_id', $cus_id)
-            ->where('status', 'in cart')
-            ->first();
-        if ($order) {
-            $cart_details = \App\Models\CartItems::where('cart_id',$order->cart_id)->get();
-            return $cart_details;
-        } else {
+//        case when no authenticated user
+        if (auth()->user() == null) {
             return null;
+        }else { //case when authenticated user
+            $cus_id = auth()->user()->id;
+            // Check if an order exists for the customer
+            $order = \App\Models\Orders::where('customer_id', $cus_id)
+                ->where('status', 'in cart')
+                ->first();
+            if ($order) {
+                $cart_details = \App\Models\CartItems::where('cart_id',$order->cart_id)->get();
+                return $cart_details;
+            } else {
+                return null;
+            }
         }
     }
 
@@ -33,7 +38,7 @@ new class extends Component {
 }; ?>
 
 
-<div class="navbar w-9/12 rounded-lg shadow-lg mt-2">
+<div class="navbar w-9/12 rounded-lg mt-2">
     <div class="navbar-start">
         <div class="dropdown">
             <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
@@ -47,7 +52,7 @@ new class extends Component {
                 <li><a href="/all_products">Our products</a></li>
             </ul>
         </div>
-        <a class="btn btn-ghost text-xl">SuppS</a>
+        <a class="text-2xl motion-safe:animate-bounce font-bold px-3">Supplements</a>
     </div>
     <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1">
@@ -110,7 +115,7 @@ new class extends Component {
 {{--            @if (Route::has('register'))--}}
             <a
                 href="{{ route('register') }}"
-                class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white bg-accent ml-2 hover:scale-105 duration-300"
+                class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white bg-accent ml-2 hover:scale-105 "
             >
                 Register
             </a>
