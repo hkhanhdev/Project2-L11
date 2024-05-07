@@ -86,7 +86,7 @@ new class extends Component {
     public function get_product($prd_id)
     {
         $product = \App\Models\Products::query()->where('id',$prd_id)->with(['brand','cate'])->first();
-//        dd($product);
+//        dd($product->quantity);
         return $product;
     }
     public function with():array
@@ -102,24 +102,21 @@ new class extends Component {
         <div class="px-4 py-10 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] relative flex justify-center w-96 bg-white">
             <img src="https://th.bing.com/th/id/OIP.-lcAsgnii8chGPixD71CRQHaHa?rs=1&pid=ImgDetMain" alt="Product" class="rounded object-cover" />
         </div>
-        <div class="mt-6 flex flex-wrap flex-col justify-center mx-auto items-center" x-data="{ count: 1,price:{{$product['price']}}}" >
-            <h2 class="text-2xl font-extrabold text-[#333]">{{$product['name']}}</h2>
+        <div class="mt-6 flex flex-wrap flex-col justify-center mx-auto items-center" x-data="{ count: 1, price: {{$product->price}}, maxQuantity: {{$product->quantity}} }">
+            <h2 class="text-2xl font-extrabold text-[#333]">{{$product->name}}</h2>
             <div class="flex gap-4 mt-2 justify-center">
-{{--                Total price--}}
-                <p class="text-[#333] text-2xl font-bold" x-text="'$'+count*price"></p>
+                <p class="text-[#333] text-2xl font-bold" x-text="'$'+(count*price).toFixed(2)"></p>
             </div>
             <div class="my-2">
-                <button x-on:click="count = count > 1 ? count-1 : count" class="w-10 bg-red-400 rounded-md">-</button>
-{{--                <input type="text" class="input " x-model="count">--}}
+                <button x-on:click="count = count > 1 ? count - 1 : count" class="w-10 bg-red-400 rounded-md">-</button>
                 <span x-model="count" x-text="count"></span>
-                {{--                    <div class="badge badge-primary badge-lg rounded-full"><span x-model="count"></span></div>--}}
-                <button x-on:click="count++" class="w-10 bg-blue-400 rounded-md" >+</button>
+                <button x-on:click="count = count < maxQuantity ? count + 1 : count" class="w-10 bg-blue-400 rounded-md">+</button>
             </div>
             <div class="flex space-x-2 mb-2 justify-center items-center">
-
             </div>
             <button class="btn btn-wide btn-lg btn-primary hover:scale-105 text-primary-content" wire:click="processCart({{$product->id}},count,count*price)">Add to cart</button>
         </div>
+
     </div>
     <div class="divider divider-horizontal"></div>
     <div class="card-body">
