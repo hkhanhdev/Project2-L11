@@ -4,6 +4,7 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     //
+    public $listeners = ["resetCart" => '$refresh'];
     public function toCart()
     {
         return redirect()->route("cart");

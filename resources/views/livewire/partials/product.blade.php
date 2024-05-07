@@ -32,6 +32,7 @@ new class extends Component {
 
             // Check if the update was successful
             if ($existingCartItem->save()) {
+                $this->dispatch("resetCart");
                 $this->success("Quantity updated in cart successfully!");
             } else {
                 $this->error("Failed to update quantity in cart.");
@@ -47,6 +48,7 @@ new class extends Component {
 
             // Optionally, you can check if the insertion was successful
             if ($cartItem) {
+                $this->dispatch("resetCart");
                 $this->success("Item added to cart successfully!");
             } else {
                 $this->error("Failed to add item to cart.");

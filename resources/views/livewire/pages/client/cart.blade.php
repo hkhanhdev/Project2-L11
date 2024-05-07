@@ -43,12 +43,12 @@ class extends Component {
         $order = \App\Models\Orders::find($cart_id);
         $order->status = 'pending';
         $order->save();
+        $this->dispatch("resetCart");
         $this->checkoutForm = false;
         $this->success("Your order has been made!","Waiting for confirmation",position: 'toast-top toast-end');
     }
     public function updateItem($item_id,$based_price,$mode)
     {
-//        dd($item_id,$based_price,$mode);
         // Check if the product already exists in the cart
         $item_to_update = \App\Models\CartItems::where('item_id', $item_id)
             ->first();
@@ -60,8 +60,8 @@ class extends Component {
 
             // Check if the update was successful
             if ($item_to_update->save()) {
+                $this->dispatch("resetCart");
                 $this->success("Quantity updated in cart successfully!");
-//                $this->reset();
             } else {
                 $this->error("Failed to update quantity in cart.");
             }
@@ -70,15 +70,14 @@ class extends Component {
             $item_to_update->subtotal = $based_price*($item_to_update->cart_quantity);
             // Check if the update was successful
             if ($item_to_update->save()) {
+                $this->dispatch("resetCart");
                 $this->success("Quantity updated in cart successfully!");
-//                $this->reset();
             } else {
                 $this->error("Failed to update quantity in cart.");
             }
         }else {
             $this->deleteModal = true;
             $this->item_to_del = $item_id;
-//            $this->error("Cannot do that!");
         }
     }
     public function loadCOF()
@@ -100,9 +99,11 @@ class extends Component {
         if ($item) {
             $item->delete();
             // The user with ID 1 has been deleted
+            $this->dispatch("resetCart");
             $this->success("Item $id deleted successfully!",position: "toast-top toast-end");
             $this->reset();
         } else {
+            $this->dispatch("resetCart");
             $this->error("Cannot delete that item. Please try again!",position: "toast-top toast-end");
         }
     }
@@ -211,15 +212,12 @@ class extends Component {
                                         <button class="btn btn-outline btn-error btn-xs" x-on:click="count = count > 1 ? count-1 : count"
                                                 wire:click="updateItem({{$item->item_id}},price,'decrement')" wire:loading.class="loading loading-spinner btn-disabled"
                                         >-</button>
-                                        {{--                <input type="text" class="input " x-model="count">--}}
                                         <span x-model="count" x-text="{{$item->cart_quantity}}" class="mx-2"></span>
-                                        {{--                    <div class="badge badge-primary badge-lg rounded-full"><span x-model="count"></span></div>--}}
                                         <button class="btn btn-outline btn-success btn-xs" x-on:click="count++"
                                                 wire:click="updateItem({{$item->item_id}},price,'increment')" wire:loading.class="loading loading-spinner btn-disabled"
                                         >+</button>
                                     </div>
                                 </td>
-{{--                                <td x-text="'$'+(count*price).toFixed(2)"></td>--}}
                                 <td>${{$item->subtotal}}</td>
                                 <td></td>
                                 <th>
