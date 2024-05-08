@@ -13,18 +13,34 @@ new
 class extends Component {
     use Toast, WithPagination, WithoutUrlPagination;
 
+    public int $step = 1;
     public string $search = '';
+    public bool $addDrawer = false;
     public bool $updateOrder = false;
     public $status = 'in cart';
     public $active_cart_id = '';
+    public string $search_product = '';
 
+    public function next()
+    {
+        $this->step++;
+    }
+    public function prev()
+    {
+        if ($this->step == 1) {
+            $this->warning("Cannot going back to previous step!",position: 'toast-bottom');
+        }else{
+            $this->step--;
+        }
+    }
     public function updateStatus()
     {
         $order = \App\Models\Orders::find($this->active_cart_id);
+        $order->seller_id = auth()->user()->id;
         $order->status = $this->status;
         $order->save();
         $this->updateOrder = false;
-        $this->success("Order status updated!");
+        $this->success("Order status updated!",position: 'toast-bottom toast-end');
 //        dd($this->status,$this->active_cart_id);
     }
     public function openUpdateModal($current_status,$active_cart_id)
@@ -56,8 +72,7 @@ class extends Component {
             <x-ui-input placeholder="Search by order ID" wire:model.live.debounce="search" clearable icon="o-magnifying-glass"/>
         </x-slot:middle>
         <x-slot:actions>
-{{--            <x-ui-button label="Filters" @click="$wire.filter_drawer = true" responsive icon="o-funnel"/>--}}
-            <x-ui-button icon="o-plus" class="btn-primary" label="Add" @click="$wire.add_drawer = true"/>
+            <x-ui-button icon="o-plus" class="btn-primary" label="Add" @click="$wire.addDrawer = true"/>
         </x-slot:actions>
     </x-ui-header>
     <x-ui-card>
@@ -71,6 +86,7 @@ class extends Component {
                     <th></th>
                     <th></th>
                     <th></th>
+                    <th>Seller</th>
                     <th>Customer name</th>
                     <th>Customer email</th>
                     <th>Customer phone</th>
@@ -81,7 +97,6 @@ class extends Component {
                 </tr>
                 </thead>
                 <tbody>
-                <!-- order1 -->
                 @foreach($orders as $order)
                     <tr class="bg-base-200">
                         <td>{{$order->cart_id}}</td>
@@ -89,10 +104,11 @@ class extends Component {
                         <th>Product ID</th>
                         <th>Quantity</th>
                         <th>Subtotal</th>
-                        <td>{{$order->customer->name}}</td>
-                        <td>{{$order->customer->email}}</td>
-                        <td>{{$order->customer->phone}}</td>
-                        <td>{{$order->customer->address}}</td>
+                        <td>{{$order->seller?$order->seller->name: ''}}</td>
+                        <td>{{$order->name??$order->customer->name}}</td>
+                        <td>{{$order->email??$order->customer->email}}</td>
+                        <td>{{$order->phone??$order->customer->phone}}</td>
+                        <td>{{$order->address??$order->customer->address}}</td>
                         <td>{{$order->items->sum('subtotal')}}</td>
                         @if($order->status == 'pending')
                             <td><span class="badge badge-warning">Pending</span></td>
@@ -105,7 +121,6 @@ class extends Component {
                         @else
                             <td><span class="badge badge-error">Canceled</span></td>
                         @endif
-{{--                        {{dd($order->status)}}--}}
                         <td>
                             <button class="btn btn-sm btn-info" wire:click="openUpdateModal('{{$order->status}}','{{$order->cart_id}}')" >
                                 Edit
@@ -137,7 +152,35 @@ class extends Component {
         </div>
 
     </x-ui-card>
+{{--add drawer--}}
+    <x-ui-drawer
+        wire:model="addDrawer"
+        title="Offline order"
+        subtitle="Add new order for offline customers"
+        separator
+        with-close-button
+        class="w-11/12 lg:w-1/2"
+    >
+        <x-ui-steps wire:model="step" class="border my-5 p-5">
+            <x-ui-step step="1" text="Add items">
+                <x-ui-input placeholder="Search by product ID" wire:model.live.debounce="search_product" clearable icon="o-magnifying-glass"/>
+            </x-ui-step>
+            <x-ui-step step="2" text="Payment">
+                Payment step
+            </x-ui-step>
+            <x-ui-step step="3" text="Receive Product" class="bg-orange-500/20">
+                Receive Product
+            </x-ui-step>
+        </x-ui-steps>
 
+        <x-slot:actions>
+            <x-ui-button label="Cancel" @click="$wire.addDrawer = false" />
+            <x-ui-button label="Previous" wire:click="prev" spinner="prev"/>
+            <x-ui-button label="Next" wire:click="next" spinner="next"/>
+            <x-ui-button label="Confirm" class="btn-primary {{ $step!=3 ? 'btn-disabled' : '' }}" icon="o-check" />
+        </x-slot:actions>
+    </x-ui-drawer>
+{{--    edit modal--}}
     <x-ui-modal wire:model="updateOrder" title="Update order status" subtitle="" >
         <select class="select select-info w-full max-w-xs" wire:model="status">
             <option disabled selected>Status</option>
@@ -149,7 +192,7 @@ class extends Component {
         </select>
 
         <x-slot:actions>
-            <x-ui-button label="Cancel" @click="$wire.updateOrder = false" />
+            <x-ui-button label="Cancel" @click="$wire.updateOrder=false" />
             <x-ui-button label="Update" class="btn-primary" wire:click="updateStatus"/>
         </x-slot:actions>
     </x-ui-modal>

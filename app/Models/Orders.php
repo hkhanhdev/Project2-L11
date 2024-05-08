@@ -9,10 +9,10 @@ class Orders extends Model
 {
     use HasFactory;
     protected $primaryKey = 'cart_id';
-    public $timestamps = false;
     protected $fillable = [
         'customer_id',
-        'status'
+        'status',
+        'seller_id'
     ];
     protected $guarded = [
         'cart_id'
@@ -26,4 +26,9 @@ class Orders extends Model
     {
         return $this->belongsTo(User::class, 'customer_id', 'id');
     }
+    public function seller()
+    {
+        return $this->belongsTo(User::class, 'seller_id', 'id');
+    }
+
 }
