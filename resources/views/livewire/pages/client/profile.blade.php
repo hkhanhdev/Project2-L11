@@ -8,13 +8,13 @@ use Illuminate\Validation\Rule;
 new #[Layout("components.layouts.guest")]
 #[Title("Profile")]
 class extends Component {
-    //
     use \Mary\Traits\Toast;
     public $full_location = ['display'=>'Profile','route'=>'profile','icon_name'=>"o-user"];
 
     public bool $logoutModal = false;
     public bool $editModal = false;
     public bool $cancelOrder = false;
+    public bool $detailsDrawer = false;
     public $current_user_id;
     public $name;
     public $email;
@@ -22,6 +22,7 @@ class extends Component {
     public $address;
     public $createdAt;
     public $id_to_cancel;
+    public $order_details = '';
 
     protected $rules = [];
 
@@ -76,12 +77,19 @@ class extends Component {
         $timeDifference = $createdAt->diffForHumans($now);
         return $timeDifference;
     }
+
+    public function viewDetails($order_id)
+    {
+        $this->order_details = $order_id;
+        $this->detailsDrawer = true;
+        return \App\Models\Orders::find($this->order_details);
+    }
     public function with():array
     {
         return [
-//            'user_info' => auth()->user(),
             'user_info' => $this->getUserInfo(),
-            'orders_info' => auth()->user()->orders->where('status','!=','in cart')
+            'orders_info' => auth()->user()->orders->where('status','!=','in cart'),
+            'order_info' => \App\Models\Orders::find($this->order_details)
         ];
     }
 
@@ -150,7 +158,6 @@ class extends Component {
                         <span class="font-semibold text-2xl">Orders History</span>
                         <span class="">Check recent orders</span>
                     </div>
-
                     <hr class="my-3 border-t border-gray-300">
                     <div class="overflow-y-auto h-2/3 flex flex-col gap-4 p-4">
                         @foreach($orders_info as $order)
@@ -173,7 +180,7 @@ class extends Component {
                                             <span class="font-semibold">Status:<span class="badge badge-error">Canceled</span></span>
                                             <button class="btn btn-error btn-disabled">Cancel order</button>
                                         @endif
-                                        <button class="btn btn-primary">View Details</button>
+                                        <button class="btn btn-primary" wire:click="viewDetails({{$order->cart_id}})" wire:loading.class="loading loading-spin">View Details</button>
                                     </div>
                                 </div>
                             </div>
@@ -187,6 +194,72 @@ class extends Component {
                             <x-ui-button label="Confirm" class="btn-primary" wire:click="cancelingOrder({{$id_to_cancel}})"/>
                         </x-slot:actions>
                     </x-ui-modal>
+{{--                    detail order drawer--}}
+                    <x-ui-drawer wire:model="detailsDrawer" class="w-11/12 lg:w-4/5" right>
+                        <table class="table mb-10">
+                            <!-- head -->
+                            <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th>Seller</th>
+                                <th>Customer name</th>
+                                <th>Customer email</th>
+                                <th>Customer phone</th>
+                                <th>Customer address</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @if($order_info != null)
+                                    <tr class="bg-base-200">
+                                        <td>{{$order_info->cart_id}}</td>
+                                        <th>Item ID</th>
+                                        <th>Product ID</th>
+                                        <th>Quantity</th>
+                                        <th>Subtotal</th>
+                                        <td>{{$order_info->seller?$order_info->seller->name: ''}}</td>
+                                        <td>{{$order_info->name??$order_info->customer->name??''}}</td>
+                                        <td>{{$order_info->email??$order_info->customer->email??''}}</td>
+                                        <td>{{$order_info->phone??$order_info->customer->phone??''}}</td>
+                                        <td>{{$order_info->address??$order_info->customer->address??''}}</td>
+                                        <td>{{$order_info->items->sum('subtotal')}}</td>
+                                        @if($order_info->status == 'pending')
+                                            <td><span class="badge badge-warning">Pending</span></td>
+                                        @elseif($order_info->status == 'delivering')
+                                            <td><span class="badge badge-info">Delivering</span></td>
+                                        @elseif($order_info->status == 'delivered')
+                                            <td><span class="badge bg-green-400">Delivered</span></td>
+                                        @elseif($order_info->status == 'in cart')
+                                            <td><span class="badge badge-success">In Cart</span></td>
+                                        @else
+                                            <td><span class="badge badge-error">Canceled</span></td>
+                                        @endif
+                                    </tr>
+                                    @foreach($order_info->items as $item)
+                                        <tr>
+                                            <th class="bg-base-200"></th>
+                                            <td >{{$item->item_id}}</td>
+                                            <td >{{$item->product_id}}</td>
+                                            <td >{{$item->cart_quantity}}</td>
+                                            <td >${{$item->subtotal}}</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            </tbody>
+                        </table>
+                        <x-ui-button label="Close" @click="$wire.detailsDrawer = false" />
+                    </x-ui-drawer>
                 </div>
             </div>
             <div class="flex card w-10/12 p-3" x-show="edit" x-transition:enter="transition ease-out duration-300"
