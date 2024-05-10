@@ -282,6 +282,7 @@ class extends Component {
                 @endforeach
                 </tbody>
             </table>
+            {{$orders->links()}}
         </div>
 
     </x-ui-card>
