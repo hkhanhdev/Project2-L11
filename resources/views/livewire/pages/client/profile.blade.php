@@ -14,12 +14,14 @@ class extends Component {
 
     public bool $logoutModal = false;
     public bool $editModal = false;
+    public bool $cancelOrder = false;
     public $current_user_id;
     public $name;
     public $email;
     public $phone;
     public $address;
     public $createdAt;
+    public $id_to_cancel;
 
     protected $rules = [];
 
@@ -33,6 +35,18 @@ class extends Component {
         sleep(1);
         $this->redirect(route("client_profile"));
         $this->success("Updated!",position: 'toast-top toast-end');
+    }
+    public function openCancelModal($id)
+    {
+        $this->id_to_cancel = $id;
+        $this->cancelOrder = true;
+    }
+    public function cancelingOrder($id)
+    {
+        $order = \App\Models\Orders::find($id);
+        $order->update(['status'=>"canceled"]);
+        $this->cancelOrder = false;
+        $this->success("Order canceled!");
     }
     protected function setRules()
     {
@@ -148,12 +162,16 @@ class extends Component {
                                         <span class="font-semibold">Total:${{$order->items?$order->items->sum('subtotal') : 0}}</span>
                                         @if($order->status == 'pending')
                                             <span class="font-semibold">Status:<span class="badge badge-warning">Pending</span></span>
+                                            <button class="btn btn-error" wire:click="openCancelModal({{$order->cart_id}})">Cancel order</button>
                                         @elseif($order->status == 'delivering')
-                                            <span class="font-semibold">Status:<span class="badge badge-warning">Delivering</span></span>
+                                            <span class="font-semibold">Status:<span class="badge badge-info">Delivering</span></span>
+                                            <button class="btn btn-error btn-disabled">Cancel order</button>
                                         @elseif($order->status == 'delivered')
-                                            <span class="font-semibold">Status:<span class="badge badge-warning">Delivered</span></span>
+                                            <span class="font-semibold">Status:<span class="badge badge-success">Delivered</span></span>
+                                            <button class="btn btn-error btn-disabled">Cancel order</button>
                                         @else
-                                            <span class="font-semibold">Status:<span class="badge badge-warning">Canceled</span></span>
+                                            <span class="font-semibold">Status:<span class="badge badge-error">Canceled</span></span>
+                                            <button class="btn btn-error btn-disabled">Cancel order</button>
                                         @endif
                                         <button class="btn btn-primary">View Details</button>
                                     </div>
@@ -161,7 +179,14 @@ class extends Component {
                             </div>
                         @endforeach
                     </div>
-
+{{--                    cancel order modal--}}
+                    <x-ui-modal wire:model="cancelOrder" persistent class="backdrop-blur">
+                        <div>Are you sure to cancel this order?</div>
+                        <x-slot:actions>
+                            <x-ui-button label="Cancel" @click="$wire.cancelOrder = false" />
+                            <x-ui-button label="Confirm" class="btn-primary" wire:click="cancelingOrder({{$id_to_cancel}})"/>
+                        </x-slot:actions>
+                    </x-ui-modal>
                 </div>
             </div>
             <div class="flex card w-10/12 p-3" x-show="edit" x-transition:enter="transition ease-out duration-300"
