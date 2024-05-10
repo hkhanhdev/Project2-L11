@@ -7,6 +7,7 @@
     <title>{{ isset($title) ? $title : config('app.name') }}</title>
     <link rel="icon"
           href="https://www.svgrepo.com/show/474399/3u-server.svg">
+    @yield("chart_js")
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
