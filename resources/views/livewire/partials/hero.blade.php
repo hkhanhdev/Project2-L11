@@ -6,7 +6,7 @@ new class extends Component {
     //
 }; ?>
 
-<div class="hero min-h-svh" style="background-image: url(https://static.vecteezy.com/system/resources/previews/000/167/595/original/supplements-illustration-vector.jpg);">
+<div class="hero min-h-svh" style="background-image: url(https://ik.imagekit.io/0398925392/img_project2/image.png?updatedAt=1715401989832);">
     <div class="hero-overlay bg-opacity-60"></div>
     <div class="hero-content text-center text-neutral-content">
         <div class="max-w-md">
