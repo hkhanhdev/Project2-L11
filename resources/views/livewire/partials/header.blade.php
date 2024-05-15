@@ -66,12 +66,26 @@ new class extends Component {
     </div>
     <div class="navbar-end">
         @auth
-            <a
-                href="{{ route('dashboard') }}"
-                class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-            >
-                Dashboard
-            </a>
+            @role("1")
+                <a
+                    href="{{ route('dashboard') }}"
+                    class="rounded-md px-3 py-2 ring-1 ring-transparent transition focus:outline-none focus-visible:ring-[#FF2D20]"
+                >
+                    Administrator panel
+                </a>
+                <div class="dropdown dropdown-end">
+                    <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                        <div class="w-10 rounded-full">
+                            <img alt="Avt" src="https://www.svgrepo.com/show/108160/admin-with-cogwheels.svg" />
+                        </div>
+                    </div>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                        <li><a href="{{route('logout')}}">Logout</a></li>
+                    </ul>
+                </div>
+            @endrole
+
+            @role("0")
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
                     <div class="indicator">
@@ -105,6 +119,8 @@ new class extends Component {
                     <li><a href="{{route('logout')}}">Logout</a></li>
                 </ul>
             </div>
+            @endrole
+
         @else
             <a
                 href="{{ route('login') }}"
@@ -113,14 +129,12 @@ new class extends Component {
                 Log in
             </a>
 
-{{--            @if (Route::has('register'))--}}
             <a
                 href="{{ route('register') }}"
                 class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white bg-accent ml-2 hover:scale-105 "
             >
                 Register
             </a>
-{{--            @endif--}}
         @endauth
             <label class="swap swap-rotate ml-3">
                 <!-- this hidden checkbox controls the state -->
