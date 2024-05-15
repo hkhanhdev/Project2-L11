@@ -32,7 +32,7 @@
 
 {{--         BRAND--}}
         <div class="ml-5 pt-5 flex justify-center flex-col items-center">
-            <img src="https://www.svgrepo.com/show/156221/medicines.svg" alt="" class="size-20">
+            <img src="https://www.svgrepo.com/show/156221/medicines.svg" alt="" class="size-20" >
             <span class="text-3xl font-semibold">S</span>
         </div>
 
@@ -52,7 +52,7 @@
 
                 <x-ui-menu-separator />
             @endif
-
+            <x-ui-menu-item title="Back to client page" icon="o-arrow-left" link="/" class="mb-4"/>
             <x-ui-menu-item title="Dashboard" icon="m-chart-pie" link="/administration-panel/Dashboard" />
             <x-ui-menu-sub title="Products Management" icon="s-building-storefront">
                 <x-ui-menu-item title="Products" icon="o-shopping-bag" link="/administration-panel/Products" />
@@ -73,5 +73,4 @@
 {{-- Toast--}}
 <x-ui-toast />
 </body>
-
 </html>
