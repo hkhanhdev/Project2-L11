@@ -17,35 +17,35 @@ class extends Component {
     public $final_price;
     public $address;
     public $phone;
-    public $active_user;
+    public $active_user;//current logged user
 
     protected $rules = [
         'address' => ['required','string','min:8'],
         'phone' => ['required','regex:/^(?:\+84|0)?[1-9]\d{8,9}$/']
     ];
 
-    public function placeOrder($user_id,$cart_id)
+    public function placeOrder($cart_id)
     {
-//        dd($user_id,$cart_id);
         $validated = $this->validate($this->rules);
-        $this->updateOrderInfo($validated,$user_id,$cart_id);
-
+        $this->updateOrderInfo($validated,$cart_id);
     }
 
-    protected function updateOrderInfo($validated_data,$user_id,$cart_id)
+    protected function updateOrderInfo($validated_data,$cart_id)
     {
-//        update customer info first, phone and address field
-        $customer = \App\Models\User::find($user_id);
-        $customer->phone = $validated_data['phone'];
-        $customer->address = $validated_data['address'];
-        $customer->save();
+//      Get current user info
+        $cus_name = $this->active_user->name;
+        $cus_email = $this->active_user->email;
 //        update order status
         $order = \App\Models\Orders::find($cart_id);
         $order->status = 'pending';
+        $order->name = $cus_name;
+        $order->email = $cus_email;
+        $order->phone = $validated_data['phone'];
+        $order->address = $validated_data['address'];
         $order->save();
         $this->dispatch("resetCart");
         $this->checkoutForm = false;
-        $this->success("Your order has been made!","Waiting for confirmation",position: 'toast-top toast-end');
+        $this->success("Your order has been made!","Waiting for confirmation",position: 'toast-bottom toast-end');
     }
     public function updateItem($item_id,$based_price,$mode)
     {
@@ -61,9 +61,9 @@ class extends Component {
             // Check if the update was successful
             if ($item_to_update->save()) {
                 $this->dispatch("resetCart");
-                $this->success("Quantity updated in cart successfully!");
+                $this->success("Quantity updated in cart successfully!",position: 'toast-bottom toast-end');
             } else {
-                $this->error("Failed to update quantity in cart.");
+                $this->error("Failed to update quantity in cart.",position: 'toast-bottom toast-end');
             }
         }elseif ($mode == 'decrement' && $item_to_update->cart_quantity > 1) {
             $item_to_update->cart_quantity -= 1;
@@ -71,9 +71,9 @@ class extends Component {
             // Check if the update was successful
             if ($item_to_update->save()) {
                 $this->dispatch("resetCart");
-                $this->success("Quantity updated in cart successfully!");
+                $this->success("Quantity updated in cart successfully!",position: 'toast-bottom toast-end');
             } else {
-                $this->error("Failed to update quantity in cart.");
+                $this->error("Failed to update quantity in cart.",position: 'toast-bottom toast-end');
             }
         }else {
             $this->deleteModal = true;
@@ -85,10 +85,8 @@ class extends Component {
         $order = \App\Models\Orders::with('items')->find($this->active_cart_id);
         $totalPrice = $order->items->sum('subtotal');
         $this->final_price = $totalPrice;
-        $user = auth()->user();
-        $this->active_user =$user->id;
-        $this->address = $user->address;
-        $this->phone = $user->phone;
+        $this->address = $this->active_user->address;
+        $this->phone = $this->active_user->phone;
 //        this line of code would open the right drawer(checkoutForm), put it at the end because i want it to open when everything is loaded
         $this->checkoutForm = true;
     }
@@ -98,13 +96,12 @@ class extends Component {
         $item = \App\Models\CartItems::find($id);
         if ($item) {
             $item->delete();
-            // The user with ID 1 has been deleted
             $this->dispatch("resetCart");
-            $this->success("Item $id deleted successfully!",position: "toast-top toast-end");
+            $this->success("Item $id deleted successfully!",position: 'toast-bottom toast-end');
             $this->reset();
         } else {
             $this->dispatch("resetCart");
-            $this->error("Cannot delete that item. Please try again!",position: "toast-top toast-end");
+            $this->error("Cannot delete that item. Please try again!",position: 'toast-bottom toast-end');
         }
     }
 
@@ -117,21 +114,17 @@ class extends Component {
     }
     protected function getCartID(): int
     {
-        // Get the authenticated user's ID
-        $customer_id = auth()->user()->id;
-
         // Check if an order exists for the customer
-        $order = \App\Models\Orders::where('customer_id', $customer_id)
+        $order = \App\Models\Orders::where('customer_id', $this->active_user->id)
             ->where('status', 'in cart')
             ->first();
-
         // If an order exists, return its cart_id
         if ($order) {
             $this->active_cart_id = $order->cart_id;
             return $order->cart_id;
         } else {
             // No order exists, create a new one
-            return $this->createOrder($customer_id);
+            return $this->createOrder($this->active_user->id);
         }
     }
 
@@ -147,6 +140,7 @@ class extends Component {
     }
     public function with():array
     {
+        $this->active_user = auth()->user();
         return [
             "items" => $this->getCartItems()
         ];
@@ -174,12 +168,10 @@ class extends Component {
             <div class="divider"></div>
             <div class="overflow-y-auto h-96">
                 @if($items->count() == 0)
-{{--                    <span class="text-4xl text-error">Your cart is empty!</span>--}}
             </div>
             <button class="btn btn-disabled" tabindex="-1" role="button" aria-disabled="true">Proceed to checkout</button>
                 @else
                     <table class="table table-lg">
-                        <!-- head -->
                         <thead>
                         <tr>
                             <th>#</th>
@@ -199,7 +191,7 @@ class extends Component {
                         @forelse($items as $item)
                             <tr x-data="{ count: {{$item->cart_quantity}},price:{{$item->product->price}}}">
                                 <td>##{{$item->item_id}}</td>
-                                <td><img class="h-16 w-16 mr-4" src="https://via.placeholder.com/150" alt="Product image"></td>
+                                <td><img class="h-16 w-16 mr-4" src="{{$item->product->cate->img_url}}" alt="Product image"></td>
                                 <td class="w-48">{{$item->product->name}}</td>
                                 <td>{{$item->product->brand->name}}</td>
                                 <td>{{$item->product->cate->name}}</td>
@@ -232,13 +224,9 @@ class extends Component {
                         </tbody>
                     </table>
             </div>
-            <button class="btn btn-wide w-full btn-primary" wire:click="loadCOF()" ><span wire:loading.class="loading loading-spinner loading-md"></span>Proceed to checkout</button>
+            <button class="btn btn-wide w-full btn-primary mt-2" wire:click="loadCOF()" ><span wire:loading.class="loading loading-spinner loading-md"></span>Proceed to checkout</button>
                 @endif
-
         </div>
-{{--        <div class="card-body shadow-lg">--}}
-
-{{--        </div>--}}
     </div>
     <x-gap/>
     <x-footer/>
@@ -296,7 +284,7 @@ class extends Component {
         @enderror
         <x-slot:actions>
             <x-ui-button label="Cancel" @click="$wire.checkoutForm = false" />
-            <x-ui-button label="Place order" class="btn-outline btn-primary" icon="o-check" wire:click="placeOrder({{$active_user ?? ''}},{{$active_cart_id}})"/>
+            <x-ui-button label="Place order" class="btn-outline btn-primary" icon="o-check" wire:click="placeOrder({{$active_cart_id}})"/>
         </x-slot:actions>
     </x-ui-drawer>
 </div>
