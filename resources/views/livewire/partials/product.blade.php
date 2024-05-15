@@ -101,8 +101,8 @@ new class extends Component {
 
 <div class="shadow-xl flex w-9/12">
     <div class="flex flex-col p-10">
-        <div class="px-4 py-10 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] relative flex justify-center w-96 bg-white">
-            <img src="https://th.bing.com/th/id/OIP.-lcAsgnii8chGPixD71CRQHaHa?rs=1&pid=ImgDetMain" alt="Product" class="rounded object-cover" />
+        <div class="px-4 py-10 rounded-md shadow-sm  relative flex justify-center w-96 bg-white">
+            <img src="{{$product->cate->img_url}}" alt="Product" class="rounded object-cover" />
         </div>
         <div class="mt-6 flex flex-wrap flex-col justify-center mx-auto items-center" x-data="{ count: 1, price: {{$product->price}}, maxQuantity: {{$product->quantity}} }">
             <h2 class="text-2xl font-extrabold text-[#333]">{{$product->name}}</h2>
@@ -123,7 +123,7 @@ new class extends Component {
     <div class="divider divider-horizontal"></div>
     <div class="card-body">
         <div class="px-6">
-            <h3 class="text-lg font-bold text-[#333]">Product information:</h3>
+            <h3 class="text-lg font-bold text-[#333]">Details Information:</h3>
         </div>
         <div class="overflow-x-auto p-5">
             <table class="table table-zebra">
@@ -162,7 +162,7 @@ new class extends Component {
                 <tr>
                     <th>Rate</th>
                     <td>
-                        4.5/5
+                        4.0/5
                     </td>
                 </tr>
                 </tbody>
