@@ -50,8 +50,8 @@ new class extends Component {
                     <div
                         class="w-72 bg-secondary text-secondary-content shadow-md rounded-xl duration-300 hover:scale-x-105 hover:shadow-xl" wire:loading.class="loading loading-bars loading-xs ">
                         <img
-                            src="https://images-workbench.99static.com/aXEidgXayrW9Km6Oavl29cMOlSk=/99designs-contests-attachments/71/71446/attachment_71446719"
-                            alt="Product" class="h-56 w-72 object-cover rounded-t-xl"/>
+                            src="{{$product->cate->img_url}}"
+                            alt="Product" class="h-72 w-72 object-cover rounded-t-xl"/>
                         <div class="px-4 py-3 w-72 ">
                             <p class="text-xl cursor-auto text-secondary-content">#000{{$product->id}}</p>
 
