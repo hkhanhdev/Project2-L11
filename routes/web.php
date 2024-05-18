@@ -17,6 +17,11 @@ Route::get("unauthorized",function () {
     return view("unauthorized");
 })->name("fallback");
 
+Route::get("logout",function (Logout $logout){
+    $logout();
+    return redirect('/');
+})->name('logout')->middleware(['auth']);
+
 Route::middleware(['auth','verified','role:1'])->group(function () {
     Volt::route('/administration-panel/Dashboard', 'pages.admin.dashboard')->name('dashboard');
     Volt::route('/administration-panel/Products', 'pages.admin.products_management')->name('prd_mng');
@@ -25,19 +30,11 @@ Route::middleware(['auth','verified','role:1'])->group(function () {
     Volt::route('/administration-panel/Users', 'pages.admin.users_management')->name('usr_mng');
     Volt::route('/administration-panel/Orders', 'pages.admin.orders_management')->name('ord_mng');
     Volt::route('/administration-panel/Profile', 'pages.admin.profile')->name('admin_profile');
-    Route::get("logout",function (Logout $logout){
-        $logout();
-        return redirect('/');
-    })->name('logout');
 });
 
 Route::middleware(['auth','verified','role:0'])->group(function () {
     Volt::route('/cart', 'pages.client.cart')->name('cart');
     Volt::route('/profile', 'pages.client.profile')->name('client_profile');
-    Route::get("logout",function (Logout $logout){
-        $logout();
-        return redirect('/');
-    })->name('logout');
 });
 
 require __DIR__.'/auth.php';
