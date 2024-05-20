@@ -12,15 +12,15 @@ class extends Component {
     <x-ui-header title="Profile" separator progress-indicator/>
     <div class="mx-auto sm:px-6 lg:px-8 space-y-6">
         <x-ui-card>
-            <livewire:profile.update-profile-information-form />
+            <livewire:partials.update-profile-information-form />
         </x-ui-card>
 
         <x-ui-card>
-            <livewire:profile.update-password-form />
+            <livewire:partials.update-password-form />
         </x-ui-card>
 
         <x-ui-card>
-            <livewire:profile.delete-user-form />
+            <livewire:partials.delete-user-form />
         </x-ui-card>
     </div>
 </div>
