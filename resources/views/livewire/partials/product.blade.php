@@ -105,14 +105,14 @@ new class extends Component {
             <img src="{{$product->cate->img_url}}" alt="Product" class="rounded object-cover" />
         </div>
         <div class="mt-6 flex flex-wrap flex-col justify-center mx-auto items-center" x-data="{ count: 1, price: {{$product->price}}, maxQuantity: {{$product->quantity}} }">
-            <h2 class="text-2xl font-extrabold text-[#333]">{{$product->name}}</h2>
+            <h2 class="text-2xl font-extrabold">{{$product->name}}</h2>
             <div class="flex gap-4 mt-2 justify-center">
-                <p class="text-[#333] text-2xl font-bold" x-text="'$'+(count*price).toFixed(2)"></p>
+                <p class="text-2xl font-bold" x-text="'$'+(count*price).toFixed(2)"></p>
             </div>
-            <div class="my-2">
-                <button x-on:click="count = count > 1 ? count - 1 : count" class="w-10 bg-red-400 rounded-md">-</button>
+            <div class="my-2 ">
+                <button x-on:click="count = count > 1 ? count - 1 : count" class="w-5 btn btn-error rounded-md">-</button>
                 <span x-model="count" x-text="count"></span>
-                <button x-on:click="count = count < maxQuantity ? count + 1 : count" class="w-10 bg-blue-400 rounded-md">+</button>
+                <button x-on:click="count = count < maxQuantity ? count + 1 : count" class="w-5 btn btn-success rounded-md">+</button>
             </div>
             <div class="flex space-x-2 mb-2 justify-center items-center">
             </div>
@@ -123,7 +123,7 @@ new class extends Component {
     <div class="divider divider-horizontal"></div>
     <div class="card-body">
         <div class="px-6">
-            <h3 class="text-lg font-bold text-[#333]">Details Information:</h3>
+            <h3 class="text-lg font-bold ">Details Information:</h3>
         </div>
         <div class="overflow-x-auto p-5">
             <table class="table table-zebra">
@@ -169,12 +169,12 @@ new class extends Component {
             </table>
         </div>
         <div class="shadow-sm p-6">
-            <h3 class="text-lg font-bold text-[#333]">Reviews(50)</h3>
+            <h3 class="text-lg font-bold ">Reviews(50)</h3>
             <div class="grid md:grid-cols-2 gap-12 mt-6">
                 <div>
                     <div class="space-y-3">
                         <div class="flex items-center">
-                            <p class="text-sm text-[#333] font-bold">5.0</p>
+                            <p class="text-sm  font-bold">5.0</p>
                             <svg class="w-5 fill-[#333] ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
@@ -182,10 +182,10 @@ new class extends Component {
                             <div class="bg-gray-400 rounded w-full h-2 ml-3">
                                 <div class="w-2/3 h-full rounded bg-[#333]"></div>
                             </div>
-                            <p class="text-sm text-[#333] font-bold ml-3">69%</p>
+                            <p class="text-sm  font-bold ml-3">69%</p>
                         </div>
                         <div class="flex items-center">
-                            <p class="text-sm text-[#333] font-bold">4.0</p>
+                            <p class="text-sm  font-bold">4.0</p>
                             <svg class="w-5 fill-[#333] ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
@@ -193,10 +193,10 @@ new class extends Component {
                             <div class="bg-gray-400 rounded w-full h-2 ml-3">
                                 <div class="w-1/3 h-full rounded bg-[#333]"></div>
                             </div>
-                            <p class="text-sm text-[#333] font-bold ml-3">33%</p>
+                            <p class="text-sm  font-bold ml-3">33%</p>
                         </div>
                         <div class="flex items-center">
-                            <p class="text-sm text-[#333] font-bold">3.0</p>
+                            <p class="text-sm  font-bold">3.0</p>
                             <svg class="w-5 fill-[#333] ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
@@ -204,10 +204,10 @@ new class extends Component {
                             <div class="bg-gray-400 rounded w-full h-2 ml-3">
                                 <div class="w-1/6 h-full rounded bg-[#333]"></div>
                             </div>
-                            <p class="text-sm text-[#333] font-bold ml-3">16%</p>
+                            <p class="text-sm  font-bold ml-3">16%</p>
                         </div>
                         <div class="flex items-center">
-                            <p class="text-sm text-[#333] font-bold">2.0</p>
+                            <p class="text-sm  font-bold">2.0</p>
                             <svg class="w-5 fill-[#333] ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
@@ -215,10 +215,10 @@ new class extends Component {
                             <div class="bg-gray-400 rounded w-full h-2 ml-3">
                                 <div class="w-1/12 h-full rounded bg-[#333]"></div>
                             </div>
-                            <p class="text-sm text-[#333] font-bold ml-3">8%</p>
+                            <p class="text-sm  font-bold ml-3">8%</p>
                         </div>
                         <div class="flex items-center">
-                            <p class="text-sm text-[#333] font-bold">1.0</p>
+                            <p class="text-sm  font-bold">1.0</p>
                             <svg class="w-5 fill-[#333] ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
@@ -226,7 +226,7 @@ new class extends Component {
                             <div class="bg-gray-400 rounded w-full h-2 ml-3">
                                 <div class="w-[6%] h-full rounded bg-[#333]"></div>
                             </div>
-                            <p class="text-sm text-[#333] font-bold ml-3">6%</p>
+                            <p class="text-sm  font-bold ml-3">6%</p>
                         </div>
                     </div>
                 </div>
@@ -234,7 +234,7 @@ new class extends Component {
                     <div class="flex items-start">
                         <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" class="w-12 h-12 rounded-full border-2 border-white" />
                         <div class="ml-3">
-                            <h4 class="text-sm font-bold text-[#333]">Jane Doe</h4>
+                            <h4 class="text-sm font-bold ">Jane Doe</h4>
                             <div class="flex space-x-1 mt-1">
                                 <svg class="w-4 fill-[#333]" viewBox="0 0 14 13" fill="none"
                                      xmlns="http://www.w3.org/2000/svg">
@@ -261,12 +261,12 @@ new class extends Component {
                                     <path
                                         d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
                                 </svg>
-                                <p class="text-xs !ml-2 font-semibold text-[#333]">2 seconds ago</p>
+                                <p class="text-xs !ml-2 font-semibold ">2 seconds ago</p>
                             </div>
-                            <p class="text-sm mt-4 text-[#333]">Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.</p>
+                            <p class="text-sm mt-4 ">Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.</p>
                         </div>
                     </div>
-                    <button type="button" class="w-full mt-10 px-4 py-2.5 bg-transparent hover:bg-gray-50 border border-[#333] text-[#333] font-bold rounded">Read all reviews</button>
+                    <button type="button" class="w-full mt-10 px-4 py-2.5 bg-transparent hover:bg-gray-50 border border-[#333]  font-bold rounded">Read all reviews</button>
                 </div>
             </div>
         </div>
