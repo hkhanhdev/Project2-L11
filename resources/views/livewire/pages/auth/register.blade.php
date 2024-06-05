@@ -7,15 +7,22 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Livewire\Attributes\Title;
+use Mary\Traits\Toast;
 
-new #[Layout('components.layouts.guest')] class extends Component
+new #[Layout('components.layouts.guest')]
+#[Title("Register")]
+class extends Component
 {
-    use \Mary\Traits\Toast;
+    use Toast;
     public string $name = '';
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
 
+    protected $messages = [
+
+    ];
     /**
      * Handle an incoming registration request.
      */
@@ -23,7 +30,7 @@ new #[Layout('components.layouts.guest')] class extends Component
     {
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class,'ends_with:gmail.com,email.com'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
