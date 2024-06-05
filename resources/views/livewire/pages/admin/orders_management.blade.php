@@ -508,7 +508,7 @@ class extends Component {
                         @forelse($items as $item)
                             <tr x-data="{ count: {{$item->cart_quantity}},price:{{$item->product->price}}}">
                                 <td>##{{$item->item_id}}</td>
-                                <td><img class="h-16 w-16 mr-4" src="https://via.placeholder.com/150" alt="Product image"></td>
+                                <td><img class="size-full" src="{{$item->product->cate->img_url}}" alt="Product image"></td>
                                 <td class="w-48">{{$item->product->name}}</td>
                                 <td>{{$item->product->brand->name}}</td>
                                 <td>{{$item->product->cate->name}}</td>
