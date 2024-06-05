@@ -43,6 +43,7 @@ class extends Component {
         $user = \App\Models\User::find($this->user_id);
         $user->update($validated);
         $this->success('Updated', position: 'toast-bottom', timeout: 4000);
+        $this->reset();
     }
 
     public function closeModal()
