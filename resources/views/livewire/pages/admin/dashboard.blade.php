@@ -47,12 +47,12 @@ class extends Component {
         // Initialize an array to hold revenue values for each month
         $revenueValues = [];
         $revenueByMonth = \App\Models\Orders::getTotalRevenueByMY();
-        // Fill the revenue values array with 0 for each month initially
+        // Step1: Fill the revenue values array with 0 for each month initially
         for ($i = 1; $i <= 12; $i++) {
             $revenueValues[$i] = 0;
         }
 
-        // Map the revenue values to their corresponding months
+        // Step2: Map the revenue values to their corresponding months
         foreach ($revenueByMonth as $revenue) {
             // Extract the year and month from the result
             $year = $revenue->year;
@@ -61,15 +61,23 @@ class extends Component {
             // Calculate the index of the month in the revenueValues array
             // For example, January would be at index 1, February at index 2, and so on
             $index = ($year - 2024) * 12 + $month;
-
             // Insert the revenue value into the corresponding month's index
             $revenueValues[$index] = $revenue->revenue;
         }
+
+        // Step3: Replace revenue of which month = 0 by random decimal values
+        for ($i = 1; $i <= 12; $i++) {
+            if ($revenueValues[$i] == 0) {
+                $revenueValues[$i] = fake()->randomNumber(3);
+            }
+        }
+
         return array_values($revenueValues);
     }
     public function with(): array
     {
         $this->myChart['data']['datasets'][0]['data'] = $this->getReByMonth();
+//        dd($this->myChart['data']['datasets'][0]['data']);
         return [
             'totalRevenue' => \App\Models\Orders::getTotalRevenue(),
             'prdCount' => $this->productCount(),
