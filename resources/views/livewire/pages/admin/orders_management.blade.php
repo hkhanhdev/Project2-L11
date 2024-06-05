@@ -38,6 +38,7 @@ class extends Component {
         $order = \App\Models\Orders::find($current_cart_id);
         $order->update(['name'=>$this->name,'email'=>$this->email,'phone'=>$this->phone,'address'=>$this->address,'status'=>'delivered']);
         $this->success("Order $order->cart_id made!",position: 'toast-bottom');
+        $this->reset();
     }
     public function processingCart($product_id,$cart_quan,$subtotal)
     {
@@ -46,8 +47,6 @@ class extends Component {
         $current_cart_id = $this->getCartID();
         $this->active_cart_id = $current_cart_id;
         $this->addToCart($current_cart_id,$product_id,$cart_quan,$subtotal);
-
-
     }
 
     protected function addToCart($cart_id,$product_id,$quantity,$total)
@@ -605,8 +604,8 @@ class extends Component {
 
         <x-slot:actions>
             <x-ui-button label="Cancel" @click="$wire.addDrawer = false" />
-            <x-ui-button label="Previous" wire:click="prev" spinner="prev"/>
-            <x-ui-button label="Next" wire:click="next" spinner="next"/>
+            <x-ui-button label="Previous" wire:click="prev" spinner="prev" class="{{ $step==1 ? 'btn-disabled' : '' }}"/>
+            <x-ui-button label="Next" wire:click="next" spinner="next" class="{{ $step==3 ? 'btn-disabled' : '' }}"/>
             <x-ui-button label="Confirm" class="btn-primary {{ $step!=3 ? 'btn-disabled' : '' }}" icon="o-check" wire:click="confirmOrder"/>
         </x-slot:actions>
     </x-ui-drawer>

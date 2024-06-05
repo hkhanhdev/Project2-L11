@@ -13,7 +13,11 @@ class Orders extends Model
     protected $fillable = [
         'customer_id',
         'status',
-        'seller_id'
+        'seller_id',
+        'name',
+        'email',
+        'address',
+        'phone'
     ];
     protected $guarded = [
         'cart_id'
