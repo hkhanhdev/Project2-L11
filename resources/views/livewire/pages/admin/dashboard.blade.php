@@ -21,7 +21,7 @@ class extends Component {
     }
     protected function orderCount()
     {
-        return \App\Models\Orders::count();
+        return \App\Models\Orders::where('status', '!=', 'in cart')->count();
     }
 
     protected function userCount()

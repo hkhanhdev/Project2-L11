@@ -188,7 +188,7 @@ class extends Component {
     }
     public function orders()
     {
-        $orders = \App\Models\Orders::where("cart_id","LIKE","%$this->search%")->paginate(3);
+        $orders = \App\Models\Orders::where("cart_id","LIKE","%$this->search%")->where('status', '!=', 'in cart')->orderBy('cart_id', 'DESC')->paginate(3);
         return $orders;
     }
 
