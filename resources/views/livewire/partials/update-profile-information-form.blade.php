@@ -5,9 +5,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
+use Mary\Traits\Toast;
 
 new class extends Component
 {
+    use Toast;
     public string $name = '';
     public string $email = '';
 
@@ -33,14 +35,8 @@ new class extends Component
         ]);
 
         $user->fill($validated);
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
         $user->save();
-
-        $this->dispatch('profile-updated', name: $user->name);
+        $this->success("Super user profile information updated!");
     }
 
     /**
@@ -83,10 +79,7 @@ new class extends Component
         </div>
 
         <div class="flex items-center gap-4">
-            <x-ui-button label="Save" class="btn-neutral" wire:click="updateProfileInformation"/>
-            <x-action-message class="me-3" on="profile-updated">
-                {{ __('Saved.') }}
-            </x-action-message>
+            <x-ui-button label="Save" class="btn-neutral" wire:click="updateProfileInformation" spinner/>
         </div>
     </form>
 </section>

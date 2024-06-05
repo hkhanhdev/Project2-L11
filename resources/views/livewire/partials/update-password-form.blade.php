@@ -5,9 +5,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Livewire\Volt\Component;
+use Mary\Traits\Toast;
 
 new class extends Component
 {
+    use Toast;
     public string $current_password = '';
     public string $password = '';
     public string $password_confirmation = '';
@@ -33,8 +35,7 @@ new class extends Component
         ]);
 
         $this->reset('current_password', 'password', 'password_confirmation');
-
-        $this->dispatch('password-updated');
+        $this->success("Super user password updated!");
     }
 }; ?>
 
@@ -63,10 +64,7 @@ new class extends Component
         </div>
 
         <div class="flex items-center gap-4">
-            <x-ui-button label="Save" class="btn-neutral" wire:click="updatePassword"/>
-            <x-action-message class="me-3" on="password-updated">
-                {{ __('Saved.') }}
-            </x-action-message>
+            <x-ui-button label="Save" class="btn-neutral" wire:click="updatePassword" spinner/>
         </div>
     </form>
 </section>
