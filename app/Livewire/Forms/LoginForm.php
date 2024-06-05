@@ -14,7 +14,7 @@ use Mary\Traits\Toast;
 class LoginForm extends Form
 {
     use Toast;
-    #[Validate('required|string|email')]
+    #[Validate('required|string|email|ends_with:gmail.com,email.com')]
     public string $email = '';
 
     #[Validate('required|string')]
@@ -24,6 +24,8 @@ class LoginForm extends Form
     public bool $isAdmin = false;
 
     public string $role = '';
+
+    protected $messages = [];
 
     /**
      * Attempt to authenticate the request's credentials.

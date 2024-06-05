@@ -4,17 +4,14 @@ use App\Livewire\Forms\LoginForm;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
-new #[Layout('components.layouts.guest')] class extends Component
+use Livewire\Attributes\Title;
+use Mary\Traits\Toast;
+
+new #[Layout('components.layouts.guest')]
+#[Title("Authentication")]
+class extends Component
 {
-    use \Mary\Traits\Toast;
-//    protected $rules = [
-//        'email' => ['required','string','email'],
-//        'password' => ['required','string'],
-//        'isAdmin' => ['boolean']
-//    ];
-//    public $email;
-//    public $password;
-//    public $isAdmin;
+    use Toast;
 
     public LoginForm $form;
 
