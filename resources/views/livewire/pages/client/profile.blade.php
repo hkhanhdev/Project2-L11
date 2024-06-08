@@ -204,7 +204,6 @@ class extends Component {
                                 <th></th>
                                 <th></th>
                                 <th></th>
-                                <th></th>
                                 <th>Seller</th>
                                 <th>Customer name</th>
                                 <th>Customer email</th>
@@ -218,8 +217,7 @@ class extends Component {
                                 @if($order_info != null)
                                     <tr class="bg-base-200">
                                         <td>{{$order_info->cart_id}}</td>
-                                        <th>Item ID</th>
-                                        <th>Product ID</th>
+                                        <th>Product name</th>
                                         <th>Quantity</th>
                                         <th>Subtotal</th>
                                         <td>{{$order_info->seller?$order_info->seller->name: ''}}</td>
@@ -243,8 +241,7 @@ class extends Component {
                                     @foreach($order_info->items as $item)
                                         <tr>
                                             <th class="bg-base-200"></th>
-                                            <td >{{$item->item_id}}</td>
-                                            <td >{{$item->product_id}}</td>
+                                            <td >{{$item->product->name}}</td>
                                             <td >{{$item->cart_quantity}}</td>
                                             <td >${{$item->subtotal}}</td>
                                             <td></td>
