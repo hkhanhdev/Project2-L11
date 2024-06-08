@@ -78,6 +78,12 @@ class extends Component {
         return $timeDifference;
     }
 
+    public function received($id)
+    {
+        $order = \App\Models\Orders::find($id);
+        $order->update(['status'=>'success']);
+        $this->success("Successfully");
+    }
     public function viewDetails($order_id)
     {
         $this->order_details = $order_id;
@@ -175,7 +181,10 @@ class extends Component {
                                             <button class="btn btn-error btn-disabled">Cancel order</button>
                                         @elseif($order->status == 'delivered')
                                             <span class="font-semibold">Status:<span class="badge badge-success">Delivered</span></span>
-                                            <button class="btn btn-error btn-disabled">Cancel order</button>
+{{--                                            <button class="btn btn-error btn-disabled">Cancel order</button>--}}
+                                            <button class="btn btn-success" wire:click="received({{$order->cart_id}})" wire:loading.class="loading loading-spin">Received</button>
+                                        @elseif($order->status == 'success')
+                                            <span class="font-semibold">Status:<span class="badge badge-success">Received</span></span>
                                         @else
                                             <span class="font-semibold">Status:<span class="badge badge-error">Canceled</span></span>
                                             <button class="btn btn-error btn-disabled">Cancel order</button>
@@ -232,8 +241,10 @@ class extends Component {
                                             <td><span class="badge badge-info">Delivering</span></td>
                                         @elseif($order_info->status == 'delivered')
                                             <td><span class="badge bg-green-400">Delivered</span></td>
-                                        @elseif($order_info->status == 'in cart')
-                                            <td><span class="badge badge-success">In Cart</span></td>
+                                        @elseif($order_info->status == 'success')
+                                            <td>
+                                                <span class="badge badge-success">Received</span>
+                                            </td>
                                         @else
                                             <td><span class="badge badge-error">Canceled</span></td>
                                         @endif
