@@ -16,7 +16,7 @@ class extends Component {
     public int $step = 1;
     public string $search = '';
     public bool $addDrawer = false;
-    public bool $updateOrder = false;
+//    public bool $updateOrder = false;
     public $status = 'in cart';
     public $active_cart_id ;
     public string $product_query = '';
@@ -121,23 +121,27 @@ class extends Component {
             return null;
         }
     }
-    public function updateStatus()
+    public function updateOrdStatus($cart_id,$mode)
     {
-        $order = \App\Models\Orders::find($this->active_cart_id);
+        $order = \App\Models\Orders::find($cart_id);
         $order->seller_id = auth()->user()->id;
-        $order->status = $this->status;
+        if ($mode == 'confirm') {
+            $order->status = "delivering";
+        }elseif ($mode == 'cancel') {
+            $order->status = "canceled";
+        }elseif ($mode == 'delivered') {
+            $order->status = $mode;
+        }
         $order->save();
-        $this->updateOrder = false;
         $this->success("Order status updated!",position: 'toast-bottom toast-end');
-//        dd($this->status,$this->active_cart_id);
     }
-    public function openUpdateModal($current_status,$active_cart_id)
-    {
-//        dd($current_status);
-        $this->status = $current_status;
-        $this->active_cart_id = $active_cart_id;
-        $this->updateOrder = true;
-    }
+
+//    public function openUpdateModal($current_status,$active_cart_id)
+//    {
+//        $this->status = $current_status;
+//        $this->active_cart_id = $active_cart_id;
+//        $this->updateOrder = true;
+//    }
 
     protected function getCartItems()
     {
@@ -248,20 +252,27 @@ class extends Component {
                         <td>{{$order->items->sum('subtotal')}}</td>
                         @if($order->status == 'pending')
                             <td><span class="badge badge-warning">Pending</span></td>
+                            <td>
+                                <div class="join join-vertical lg:join-horizontal">
+                                    <button class="btn join-item btn-sm btn-success" wire:click="updateOrdStatus({{$order->cart_id}},'confirm')">Confirm</button>
+                                    <button class="btn join-item btn-sm btn-error" wire:click="updateOrdStatus({{$order->cart_id}},'cancel')">Cancel</button>
+                                </div>
+                            </td>
                         @elseif($order->status == 'delivering')
                             <td><span class="badge badge-info">Delivering</span></td>
+                            <td><button class="btn btn-sm btn-success" wire:click="updateOrdStatus({{$order->cart_id}},'delivered')">Delivered</button></td>
                         @elseif($order->status == 'delivered')
                             <td><span class="badge bg-green-400">Delivered</span></td>
-                        @elseif($order->status == 'in cart')
-                            <td><span class="badge badge-success">In Cart</span></td>
+                        @elseif($order->status == 'success')
+                            <td><span class="badge badge-success">Done</span></td>
                         @else
                             <td><span class="badge badge-error">Canceled</span></td>
                         @endif
-                        <td>
-                            <button class="btn btn-sm btn-info" wire:click="openUpdateModal('{{$order->status}}','{{$order->cart_id}}')" >
-                                Edit
-                            </button>
-                        </td>
+{{--                        <td>--}}
+{{--                            <button class="btn btn-sm btn-info" wire:click="openUpdateModal('{{$order->status}}','{{$order->cart_id}}')" >--}}
+{{--                                Edit--}}
+{{--                            </button>--}}
+{{--                        </td>--}}
                     </tr>
                     @foreach($order->items as $item)
                         <tr>
@@ -610,19 +621,19 @@ class extends Component {
         </x-slot:actions>
     </x-ui-drawer>
 {{--    edit modal--}}
-    <x-ui-modal wire:model="updateOrder" title="Update order status" subtitle="" >
-        <select class="select select-info w-full max-w-xs" wire:model="status">
-            <option disabled selected>Status</option>
-            <option value="in cart" {{ $status == 'in cart' ? 'disabled' : '' }}>In Cart</option>
-            <option value="pending" {{ $status == 'pending' ? 'disabled' : '' }}>Pending</option>
-            <option value="delivering" {{ $status == 'delivering' ? 'disabled' : '' }}>Delivering</option>
-            <option value="delivered" {{ $status == 'delivered' ? 'disabled' : '' }}>Delivered</option>
-            <option value="canceled" {{ $status == 'canceled' ? 'disabled' : '' }}>Canceled</option>
-        </select>
+{{--    <x-ui-modal wire:model="updateOrder" title="Update order status" subtitle="" >--}}
+{{--        <select class="select select-info w-full max-w-xs" wire:model="status">--}}
+{{--            <option disabled selected>Status</option>--}}
+{{--            <option value="in cart" {{ $status == 'in cart' ? 'disabled' : '' }}>In Cart</option>--}}
+{{--            <option value="pending" {{ $status == 'pending' ? 'disabled' : '' }}>Pending</option>--}}
+{{--            <option value="delivering" {{ $status == 'delivering' ? 'disabled' : '' }}>Delivering</option>--}}
+{{--            <option value="delivered" {{ $status == 'delivered' ? 'disabled' : '' }}>Delivered</option>--}}
+{{--            <option value="canceled" {{ $status == 'canceled' ? 'disabled' : '' }}>Canceled</option>--}}
+{{--        </select>--}}
 
-        <x-slot:actions>
-            <x-ui-button label="Cancel" @click="$wire.updateOrder=false" />
-            <x-ui-button label="Update" class="btn-primary" wire:click="updateStatus"/>
-        </x-slot:actions>
-    </x-ui-modal>
+{{--        <x-slot:actions>--}}
+{{--            <x-ui-button label="Cancel" @click="$wire.updateOrder=false" />--}}
+{{--            <x-ui-button label="Update" class="btn-primary" wire:click="updateStatus"/>--}}
+{{--        </x-slot:actions>--}}
+{{--    </x-ui-modal>--}}
 </div>
