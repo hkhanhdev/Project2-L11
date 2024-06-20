@@ -226,6 +226,7 @@ class extends Component {
                     <th></th>
                     <th></th>
                     <th></th>
+                    <th></th>
                     <th>Seller</th>
                     <th>Customer name</th>
                     <th>Customer email</th>
@@ -240,8 +241,9 @@ class extends Component {
                 @foreach($orders as $order)
                     <tr class="bg-base-200">
                         <td>{{$order->cart_id}}</td>
-                        <th>Item ID</th>
-                        <th>Product ID</th>
+                        <th>Image</th>
+                        <th>Product Name</th>
+                        <th>Price</th>
                         <th>Quantity</th>
                         <th>Subtotal</th>
                         <td>{{$order->seller?$order->seller->name: ''}}</td>
@@ -277,8 +279,11 @@ class extends Component {
                     @foreach($order->items as $item)
                         <tr>
                             <th class="bg-base-200"></th>
-                            <td >{{$item->item_id}}</td>
-                            <td >{{$item->product_id}}</td>
+                            <td >
+                                <img src="{{$item->product->cate->img_url}}" alt="">
+                            </td>
+                            <td >{{$item->product->name}}</td>
+                            <td>${{$item->product->price}}</td>
                             <td >{{$item->cart_quantity}}</td>
                             <td >${{$item->subtotal}}</td>
                             <td></td>

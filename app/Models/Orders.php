@@ -37,7 +37,7 @@ class Orders extends Model
     }
     static function getTotalRevenue()
     {
-        $totalRevenue = Orders::where("status", 'delivered')->with('items')->get()->sum(function ($order) {
+        $totalRevenue = Orders::where("status", 'delivered')->orWhere('status','success')->with('items')->get()->sum(function ($order) {
             return $order->items->sum('subtotal');
         });
         return $totalRevenue;
@@ -45,7 +45,7 @@ class Orders extends Model
 
     static function getTotalRevenueByMY()
     {
-        $revenueByMonth = Orders::where('status', 'delivered')
+        $revenueByMonth = Orders::where('status', 'delivered')->orWhere('status','success')
             ->with('items')
             ->select(
                 DB::raw('YEAR(orders.created_at) AS year'),
@@ -55,6 +55,7 @@ class Orders extends Model
             ->join('cart_items', 'orders.cart_id', '=', 'cart_items.cart_id')
             ->groupBy(DB::raw('YEAR(orders.created_at)'), DB::raw('MONTH(orders.created_at)'))
             ->get();
+//        dd($revenueByMonth);
         return $revenueByMonth;
     }
 

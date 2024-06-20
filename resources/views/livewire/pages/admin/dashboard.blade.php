@@ -68,7 +68,7 @@ class extends Component {
         // Step3: Replace revenue of which month = 0 by random decimal values
         for ($i = 1; $i <= 12; $i++) {
             if ($revenueValues[$i] == 0) {
-                $revenueValues[$i] = fake()->randomNumber(3);
+                $revenueValues[$i] = fake()->randomNumber(2);
             }
         }
 
@@ -99,9 +99,9 @@ class extends Component {
             <div class="stat-figure text-secondary">
                 <x-ui-icon name="o-currency-dollar" class="w-10 h-10"/>
             </div>
-            <div class="stat-title">Revenue</div>
+            <div class="stat-title">Total Revenue</div>
             <div class="stat-value">{{$totalRevenue}}</div>
-            <div class="stat-desc">Jan 1st - Feb 1st</div>
+            <div class="stat-desc">This year</div>
         </div>
         <div class="stat">
             <div class="stat-figure text-secondary">

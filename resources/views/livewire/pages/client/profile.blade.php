@@ -178,7 +178,7 @@ class extends Component {
                                             <button class="btn btn-error" wire:click="openCancelModal({{$order->cart_id}})">Cancel order</button>
                                         @elseif($order->status == 'delivering')
                                             <span class="font-semibold">Status:<span class="badge badge-info">Delivering</span></span>
-                                            <button class="btn btn-error btn-disabled">Cancel order</button>
+{{--                                            <button class="btn btn-error btn-disabled">Cancel order</button>--}}
                                         @elseif($order->status == 'delivered')
                                             <span class="font-semibold">Status:<span class="badge badge-success">Delivered</span></span>
 {{--                                            <button class="btn btn-error btn-disabled">Cancel order</button>--}}
@@ -187,7 +187,7 @@ class extends Component {
                                             <span class="font-semibold">Status:<span class="badge badge-success">Received</span></span>
                                         @else
                                             <span class="font-semibold">Status:<span class="badge badge-error">Canceled</span></span>
-                                            <button class="btn btn-error btn-disabled">Cancel order</button>
+{{--                                            <button class="btn btn-error btn-disabled">Cancel order</button>--}}
                                         @endif
                                         <button class="btn btn-primary" wire:click="viewDetails({{$order->cart_id}})" wire:loading.class="loading loading-spin">View Details</button>
                                     </div>
