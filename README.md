@@ -13,6 +13,8 @@ Thread Safe version:
 ### Unzip the downloaded PHP8.2 and copy to laragon/bin/php
 ## Setting up project source code
 Clone this project into <b>laragon/www<b/> folder 
+<p></p>
+Open the project folder and copy .env.example to .env
 
 
 
