@@ -1,4 +1,4 @@
-DROP SCHEMA project3;
+/*DROP SCHEMA project3;*/
 create schema if not exists project3;
 use project3;
 
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS `products` (
     FOREIGN KEY (`cate_id`) REFERENCES `categories`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `products` VALUES (1,'Biotin-6000 Hair & Nails 60 Liquid Softgels',88,24),
+INSERT INTO `products`(id,name,brand_id,cate_id) VALUES (1,'Biotin-6000 Hair & Nails 60 Liquid Softgels',88,24),
 	(2,'Her Whey',69,24),
 	(3,'Her Daily Digest 90 Vegetarian Capsules',69,24),
 	(4,'Folic Acid 250 Tablets',19,24),
@@ -1152,7 +1152,7 @@ CREATE TABLE IF NOT EXISTS `product_details` (
     `price` NUMERIC(5, 2),
     FOREIGN KEY (`product_parent_id`) REFERENCES `products`(`id`)
 );
-INSERT INTO `product_details` VALUES (1,'Biotin-6000 Hair & Nails 60 Liquid Softgels',1,'60 Liquid Softgels','Unflavored','30',20.99),
+INSERT INTO `product_details`(id,name,product_parent_id,size,flavor,servings,price) VALUES (1,'Biotin-6000 Hair & Nails 60 Liquid Softgels',1,'60 Liquid Softgels','Unflavored','30',20.99),
 	(2,'Her Whey',2,'1.9 Lbs.','Chocolate Eclair','18',31.18),
 	(3,'Her Whey',2,'1.9 Lbs.','Cookies and Cream Pie','18',31.18),
 	(4,'Her Whey',2,'1.9 Lbs.','Fruity O''s Cereal','18',31.18),
@@ -1402,7 +1402,7 @@ INSERT INTO `product_details` VALUES (1,'Biotin-6000 Hair & Nails 60 Liquid Soft
 	(248,'IsoNatural',49,'5 Lbs.','Chocolate','5',71.99),
 	(249,'IsoNatural',49,'5 Lbs.','Natural','73',71.99),
 	(250,'IsoNatural',49,'5 Lbs.','Vanilla','5',71.99);
-INSERT INTO `product_details` VALUES (251,'Maximum Whey Protein Complex',50,'2 Lbs.','Vanilla Ice Cream','25',33.29),
+INSERT INTO `product_details`(id,name,product_parent_id,size,flavor,servings,price) VALUES (251,'Maximum Whey Protein Complex',50,'2 Lbs.','Vanilla Ice Cream','25',33.29),
 	(252,'Maximum Whey Protein Complex',50,'5 Lbs.','Cookies & Cream','62',53.99),
 	(253,'Maximum Whey Protein Complex',50,'5 Lbs.','Milk Chocolate','62',53.99),
 	(254,'Maximum Whey Protein Complex',50,'5 Lbs.','Vanilla Ice Cream','62',53.99),
@@ -1652,7 +1652,7 @@ INSERT INTO `product_details` VALUES (251,'Maximum Whey Protein Complex',50,'2 L
 	(498,'Combat Crunch Protein Bar',81,'1 Bar','Chocolate Cake','1',3.74),
 	(499,'Combat Crunch Protein Bar',81,'1 Bar','Chocolate Chip Cookie Dough','1',3.74),
 	(500,'Combat Crunch Protein Bar',81,'1 Bar','Chocolate Peanut Butter Cup','1',3.74);
-INSERT INTO `product_details` VALUES (501,'Combat Crunch Protein Bar',81,'1 Bar','Cinnamon Twist','1',3.74),
+INSERT INTO `product_details`(id,name,product_parent_id,size,flavor,servings,price) VALUES (501,'Combat Crunch Protein Bar',81,'1 Bar','Cinnamon Twist','1',3.74),
 	(502,'Combat Crunch Protein Bar',81,'1 Bar','Cookies ''N'' Cream','1',3.74),
 	(503,'Combat Crunch Protein Bar',81,'1 Bar','White Chocolate Raspberry','1',3.74),
 	(504,'Combat Crunch Protein Bar',81,'12 Bars','Chocolate Cake','12',20.24),
@@ -1902,7 +1902,7 @@ INSERT INTO `product_details` VALUES (501,'Combat Crunch Protein Bar',81,'1 Bar'
 	(748,'BCAA Energy Amino Acids',187,'30 Servings','Watermelon','30',21.99),
 	(749,'BCAA Energy Amino Acids',187,'65 Servings','Blue Raz','65',43.99),
 	(750,'BCAA Energy Amino Acids',187,'65 Servings','Cherry Limeade','65',43.99);
-INSERT INTO `product_details` VALUES (751,'BCAA Energy Amino Acids',187,'65 Servings','Fruit Punch','65',43.99),
+INSERT INTO `product_details`(id,name,product_parent_id,size,flavor,servings,price) VALUES (751,'BCAA Energy Amino Acids',187,'65 Servings','Fruit Punch','65',43.99),
 	(752,'BCAA Energy Amino Acids',187,'65 Servings','Furious Grape','65',43.99),
 	(753,'BCAA Energy Amino Acids',187,'65 Servings','Green Apple','65',43.99),
 	(754,'Essential AmiN.O. Energy',188,'6 Stick Packs','Blue Raspberry','6',11.99),
@@ -2152,7 +2152,7 @@ INSERT INTO `product_details` VALUES (751,'BCAA Energy Amino Acids',187,'65 Serv
 	(998,'Nitraflex Pump',236,'20 Servings','Fruit Punch','20',23.99),
 	(999,'Nitraflex Pump',236,'20 Servings','Watermelon','20',23.99),
 	(1000,'Nitraflex Pump',236,'20 Servings','Pink Lemonade','20',30.39);
-INSERT INTO `product_details` VALUES (1001,'Nitraflex Pump',236,'20 Servings','Unflavored','20',30.39),
+INSERT INTO `product_details`(id,name,product_parent_id,size,flavor,servings,price) VALUES (1001,'Nitraflex Pump',236,'20 Servings','Unflavored','20',30.39),
 	(1002,'The Shadow! Pre-Workout',237,'30 Servings','Blue Raspberry','30',22.79),
 	(1003,'The Shadow! Pre-Workout',237,'30 Servings','Fruit Punch','30',22.79),
 	(1004,'Pre-Train',238,'25 Servings','Blue Razz','25',20.99),
@@ -2402,7 +2402,7 @@ INSERT INTO `product_details` VALUES (1001,'Nitraflex Pump',236,'20 Servings','U
 	(1248,'Xtend Original BCAA',327,'90 Servings','Glacial Grape','90',59.99),
 	(1249,'Xtend Original BCAA',327,'90 Servings','Italian Blood Orange','90',59.99),
 	(1250,'Xtend Original BCAA',327,'90 Servings','Lemon-Lime Squeeze','90',59.99);
-INSERT INTO `product_details` VALUES (1251,'Xtend Original BCAA',327,'90 Servings','Strawberry Kiwi Splash','90',59.99),
+INSERT INTO `product_details`(id,name,product_parent_id,size,flavor,servings,price) VALUES (1251,'Xtend Original BCAA',327,'90 Servings','Strawberry Kiwi Splash','90',59.99),
 	(1252,'Xtend Original BCAA',327,'90 Servings','Tropic Thunder','90',59.99),
 	(1253,'Glutamine5000',328,'60 Servings','Unflavored','60',17.99),
 	(1254,'Glutamine5000',328,'100 Servings','Unflavored','100',29.99),
@@ -2652,7 +2652,7 @@ INSERT INTO `product_details` VALUES (1251,'Xtend Original BCAA',327,'90 Serving
 	(1498,'Green Beret Plant Protein',416,'2 Lbs.','Strawberry','30',44.99),
 	(1499,'Green Beret Plant Protein',416,'2 Lbs.','Vanilla','30',44.99),
 	(1500,'Meal',417,'5 Lbs.','Chocolate','19',54.95);
-INSERT INTO `product_details` VALUES (1501,'Meal',417,'5 Lbs.','Vanilla','20',54.95),
+INSERT INTO `product_details`(id,name,product_parent_id,size,flavor,servings,price) VALUES (1501,'Meal',417,'5 Lbs.','Vanilla','20',54.95),
 	(1502,'Fermented Pea Protein',418,'2 Lbs.','Chocolate','28',44.99),
 	(1503,'Fermented Pea Protein',418,'2 Lbs.','Unflavored','38',44.99),
 	(1504,'Fermented Pea Protein',418,'2 Lbs.','Vanilla','29',44.99),
@@ -2902,7 +2902,7 @@ INSERT INTO `product_details` VALUES (1501,'Meal',417,'5 Lbs.','Vanilla','20',54
 	(1748,'TrueFit Grass-Fed Protein',529,'4 Lbs.','Cinnamon Churro','40',56.23),
 	(1749,'TrueFit Grass-Fed Protein',529,'4 Lbs.','Vanilla','40',56.23),
 	(1750,'MRE Meal Replacement Powder',530,'7.15 Lbs.','Banana Nut Bread','715',79.99);
-INSERT INTO `product_details` VALUES (1751,'MRE Meal Replacement Powder',530,'7.15 Lbs.','Blueberry Cobbler','715',79.99),
+INSERT INTO `product_details`(id,name,product_parent_id,size,flavor,servings,price) VALUES (1751,'MRE Meal Replacement Powder',530,'7.15 Lbs.','Blueberry Cobbler','715',79.99),
 	(1752,'MRE Meal Replacement Powder',530,'7.15 Lbs.','Dutch Apple Pie','715',79.99),
 	(1753,'MRE Meal Replacement Powder',530,'7.15 Lbs.','Fudge Brownie','715',79.99),
 	(1754,'MRE Meal Replacement Powder',530,'7.15 Lbs.','Oatmeal Chocolate Chip','715',79.99),
@@ -3152,7 +3152,7 @@ INSERT INTO `product_details` VALUES (1751,'MRE Meal Replacement Powder',530,'7.
 	(1998,'Trutein',574,'4 Lbs.','Chocolate','53',69.99),
 	(1999,'Trutein',574,'4 Lbs.','Chocolate Mint','53',69.99),
 	(2000,'Trutein',574,'4 Lbs.','Chocolate Peanut Butter Cup','53',69.99);
-INSERT INTO `product_details` VALUES (2001,'Trutein',574,'4 Lbs.','CinnaBun','53',69.99),
+INSERT INTO `product_details`(id,name,product_parent_id,size,flavor,servings,price) VALUES (2001,'Trutein',574,'4 Lbs.','CinnaBun','53',69.99),
 	(2002,'Trutein',574,'4 Lbs.','Lemon Meringue Pie','53',69.99),
 	(2003,'Trutein',574,'4 Lbs.','Mocha','53',69.99),
 	(2004,'Trutein',574,'4 Lbs.','Red Velvet Cake','53',69.99),
@@ -3402,7 +3402,7 @@ INSERT INTO `product_details` VALUES (2001,'Trutein',574,'4 Lbs.','CinnaBun','53
 	(2248,'The Ripper! Fat Burner',716,'30 Servings','Fruit Punch','30',21.99),
 	(2249,'The Ripper! Fat Burner',716,'30 Servings','Pineapple Shred','30',28.79),
 	(2250,'The Ripper! Fat Burner',716,'30 Servings','Raspberry Lemonade','30',28.79);
-INSERT INTO `product_details` VALUES (2251,'The Ripper! Fat Burner',716,'30 Servings','Razor Lime','30',28.79),
+INSERT INTO `product_details`(id,name,product_parent_id,size,flavor,servings,price) VALUES (2251,'The Ripper! Fat Burner',716,'30 Servings','Razor Lime','30',28.79),
 	(2252,'Gut Cut 60 Capsules',717,'60 Capsules','Unflavored','30',19.99),
 	(2253,'CLA Softgels 90 Softgels',718,'90 Softgels','Unflavored','90',19.99),
 	(2254,'CLA',690,'180 Softgels','Unflavored','180',17.24),
@@ -3652,7 +3652,7 @@ INSERT INTO `product_details` VALUES (2251,'The Ripper! Fat Burner',716,'30 Serv
 	(2498,'Grunt Essential Amino Acids',859,'30 Servings','Cherry Lime','30',34.99),
 	(2499,'Grunt Essential Amino Acids',859,'30 Servings','Pineapple Banana','30',34.99),
 	(2500,'Grunt Essential Amino Acids',859,'30 Servings','Tiger''s Blood','30',34.99);
-INSERT INTO `product_details` VALUES (2501,'Grunt Essential Amino Acids',859,'30 Servings','Mango','30',34.99),
+INSERT INTO `product_details`(id,name,product_parent_id,size,flavor,servings,price) VALUES (2501,'Grunt Essential Amino Acids',859,'30 Servings','Mango','30',34.99),
 	(2502,'Barricade EAA & BCAAs',860,'30 Servings','Cucumber Melon Lime','30',36.99),
 	(2503,'Barricade EAA & BCAAs',860,'30 Servings','Sky Berry','30',36.99),
 	(2504,'Carnivor Beef Aminos 300 Tablets',861,'300 Tablets','Unflavored','100',19.99),
