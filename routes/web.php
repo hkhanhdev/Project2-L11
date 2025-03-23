@@ -3,10 +3,17 @@ use App\Livewire\Actions\Logout;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-Volt::route('/', 'pages.client.home')->name('home');
+//project2
+//Volt::route('/', 'pages.client.home')->name('home');
+//Volt::route('/all_products', 'pages.client.all-products')->name('all');
+//Volt::route('/product_details/{prd_id}', 'pages.client.product_details')->name('product');
 
-Volt::route('/all_products', 'pages.client.all-products')->name('all');
-Volt::route('/product_details/{prd_id}', 'pages.client.product_details')->name('product');
+//project3
+Volt::route('/', 'pages.client.home_P3')->name('home');
+Volt::route('/all_products', 'pages.client.all_products_p3')->name('all');
+Volt::route('/product_details/{prd_id}', 'pages.client.product_details_p3')->name('product');
+
+
 Volt::route('/contact', 'pages.client.contact')->name('contact');
 
 Route::fallback(function () {
@@ -36,5 +43,6 @@ Route::middleware(['auth','verified','role:0'])->group(function () {
     Volt::route('/cart', 'pages.client.cart')->name('cart');
     Volt::route('/profile', 'pages.client.profile')->name('client_profile');
 });
+
 
 require __DIR__.'/auth.php';
