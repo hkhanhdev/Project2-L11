@@ -5,17 +5,56 @@ use Livewire\Volt\Component;
 new class extends Component {
     //
     use \Mary\Traits\Toast;
+    public $prd;
+    public $prd_details;
     public $prd_id;
+    public $quantity = null;
+    public $price = null;
+    public $minPrice; // Minimum price across all variants
+    public $maxPrice; // Maximum price across all variants
+    public $count = 1;
 
+    public $filters = [
+        'size' => '',
+        'flavor' => '',
+        'servings' => '',
+        // Add more fields here as needed (e.g., 'color' => '', 'brand' => '')
+    ];
+    public $availableOptions = [
+        'size' => [],
+        'flavor' => [],
+        'servings' => [],
+    ];
 
-    public function processCart($id,$quantity,$total)
+    // Field labels for display
+    public $labels = [
+        'size' => 'Size',
+        'flavor' => 'Flavor',
+        'servings' => 'Servings',
+    ];
+
+    public function increment()
+    {
+        if ($this->price && $this->quantity && $this->count < $this->quantity) {
+            $this->count++;
+        }
+    }
+
+    public function decrement()
+    {
+        if ($this->price && $this->quantity && $this->count > 1) {
+            $this->count--;
+        }
+    }
+    public function processCart($id)
     {
         if (!\Illuminate\Support\Facades\Auth::user()) {
             $this->error("Please login as an authenticated user to process further!");
         }else {
 //            dd($id,$quantity,$total);
             $cart_id = $this->getCartID();
-            $this->addToCart($cart_id,$id,$quantity,$total);
+            $totalPrice = $this->price ? $this->count * $this->price : 0;
+            $this->addToCart($cart_id,$id,$this->count,$totalPrice);
         }
     }
     protected function addToCart($cart_id,$product_id,$quantity,$total)
@@ -91,34 +130,172 @@ new class extends Component {
 //        dd($product->quantity);
         return $product;
     }
+    public function updateOptions(bool $isInit = false)
+    {
+        $filteredDetails = $this->prd_details;
+
+        // Apply filters for each selected value
+        foreach ($this->filters as $key => $value) {
+            if ($value) {
+                $filteredDetails = $filteredDetails->filter(function ($detail) use ($key, $value) {
+                    // Handle servings as string since it's an integer in DB
+                    $detailValue = $key === 'servings' ? (string) $detail->$key : $detail->$key;
+                    return $detailValue === $value;
+                });
+            }
+        }
+
+        // Update available options for each field
+        foreach ($this->availableOptions as $key => &$options) {
+            $options = $filteredDetails->pluck($key)
+                ->unique()
+                ->map(function ($item) use ($key) {
+                    return ['name' => $key === 'servings' ? (string) $item : $item];
+                })
+                ->values()
+                ->toArray();
+        }
+        if (!$isInit) {
+            if ($filteredDetails->count() == 1) { //When the only product left
+                // Update price based on the filtered result
+                $selectedProduct = $filteredDetails->first(); // Get the first matching product
+//        dd($selectedProduct);
+                $this->price = $selectedProduct ? $selectedProduct->price : null; // Set price or null if no match
+                $this->quantity = $selectedProduct ? $selectedProduct->quantity : null;
+            }
+        }
+
+    }
+
+
+
+//    private function initOptions()
+//    {
+//        $this->availableFlavors = $this->prd_details->map(function ($detail) {
+//            return [
+//                'name' => $detail->flavor
+//            ];
+//        });
+//        $this->availableFlavors = collect($this->availableFlavors)->unique('name')->values()->all();
+//
+//        $this->availableSizes = $this->prd_details->map(function ($detail) {
+//            return [
+//                'name' => $detail->size
+//            ];
+//        });
+//        $this->availableSizes = collect($this->availableSizes)->unique('name')->values()->all();
+//
+//        $this->availableServings = $this->prd_details->map(function ($detail) {
+//            return [
+//                'name' => $detail->servings
+//            ];
+//        });
+//        $this->availableServings = collect($this->availableServings)->unique('name')->values()->all();
+//    }
     public function with():array
     {
+        $product = $this->get_product($this->prd_id);
+        $this->prd_details = $product->details;
+        // Calculate initial min and max prices
+        $this->minPrice = $this->prd_details->min('price');
+        $this->maxPrice = $this->prd_details->max('price');
+
+        $this->updateOptions(isInit: true);
         return [
-            'product' => $this->get_product($this->prd_id)
+            'product' => $product
         ];
     }
 }; ?>
 
 <div class="shadow-xl flex w-9/12">
-    <div class="flex flex-col p-10">
-        <div class="px-4 py-10 rounded-md shadow-sm  relative flex justify-center w-96 bg-white">
-            <img src="{{$product->cate->img_url}}" alt="Product" class="rounded object-cover" />
-        </div>
-        <div class="mt-6 flex flex-wrap flex-col justify-center mx-auto items-center" x-data="{ count: 1, price: {{$product->price}}, maxQuantity: {{$product->quantity}} }">
-            <h2 class="text-2xl font-extrabold">{{$product->name}}</h2>
-            <div class="flex gap-4 mt-2 justify-center">
-                <p class="text-2xl font-bold" x-text="'$'+(count*price).toFixed(2)"></p>
-            </div>
-            <div class="my-2 ">
-                <button x-on:click="count = count > 1 ? count - 1 : count" class="w-5 btn btn-error rounded-md">-</button>
-                <span x-model="count" x-text="count"></span>
-                <button x-on:click="count = count < maxQuantity ? count + 1 : count" class="w-5 btn btn-success rounded-md">+</button>
-            </div>
-            <div class="flex space-x-2 mb-2 justify-center items-center">
-            </div>
-            <button class="btn btn-wide btn-lg btn-primary hover:scale-105 text-primary-content" wire:click="processCart({{$product->id}},count,count*price)">Add to cart</button>
-        </div>
+{{--    <div class="flex flex-col p-10">--}}
+{{--        <div class="px-4 py-10 rounded-md shadow-sm  relative flex justify-center w-96 bg-white">--}}
+{{--            <img src="{{$product->cate->img_url}}" alt="Product" class="rounded object-cover" />--}}
+{{--        </div>--}}
+{{--        <div class="mt-6 flex flex-wrap flex-col justify-center mx-auto items-center" x-data="{ count: 1, price: {{$price}}, maxQuantity: {{$quantity??null}} }">--}}
+{{--            <h2 class="text-2xl font-extrabold">{{$product->name}}</h2>--}}
+{{--            <div class="flex gap-4 mt-2 justify-center">--}}
+{{--                <p class="text-2xl font-bold" x-text="'$'+(count*price).toFixed(2)"></p>--}}
+{{--            </div>--}}
+{{--            <div class="my-2 ">--}}
+{{--                <button x-on:click="count = count > 1 ? count - 1 : count" class="w-5 btn btn-error rounded-md">-</button>--}}
+{{--                <span x-model="count" x-text="count"></span>--}}
+{{--                <button x-on:click="count = count < maxQuantity ? count + 1 : count" class="w-5 btn btn-success rounded-md">+</button>--}}
+{{--            </div>--}}
+{{--            <div class="flex space-x-2 mb-2 justify-center items-center">--}}
+{{--            </div>--}}
+{{--            <button class="btn btn-wide btn-lg btn-primary hover:scale-105 text-primary-content" wire:click="processCart({{$product->id}},count,count*price)">Add to cart</button>--}}
+{{--        </div>--}}
 
+{{--    </div>--}}
+    <div class="flex flex-col p-10">
+        <div class="px-4 py-10 rounded-md shadow-sm relative flex justify-center w-96 bg-white">
+            <img src="{{ $product->cate->img_url }}" alt="Product" class="rounded object-cover" />
+        </div>
+        <div class="mt-6 flex flex-wrap flex-col justify-center mx-auto items-center">
+            <h2 class="text-2xl font-extrabold">{{ $product->name }}</h2>
+            <div class="flex gap-4 mt-2 justify-center">
+                <p class="text-2xl font-bold transition-opacity duration-300 ease-in-out"
+                   wire:transition>
+                    @if($price)
+                        ${{ number_format($count * $price, 2) }}
+                    @else
+                        ${{ number_format($minPrice, 2) }} - ${{ number_format($maxPrice, 2) }}
+                    @endif
+                </p>
+            </div>
+            <div class="my-2">
+                <button
+                    wire:click="decrement"
+                    class="w-5 btn btn-error rounded-md"
+                    @if(!$price || !$quantity) disabled @endif
+                >-</button>
+                <span class="px-4 transition-opacity duration-300 ease-in-out"
+                      wire:transition>{{ $count }}</span>
+                <button
+                    wire:click="increment"
+                    class="w-5 btn btn-success rounded-md"
+                    @if(!$price || !$quantity || $count >= $quantity) disabled @endif
+                >+</button>
+            </div>
+            <button
+                wire:click="processCart({{ $product->id }})"
+                class="btn btn-wide btn-lg btn-primary hover:scale-105 text-primary-content"
+                @if(!$price || !$quantity) disabled @endif
+            >
+                Add to cart
+            </button>
+        </div>
+{{--        <div--}}
+{{--            class="mt-6 flex flex-wrap flex-col justify-center mx-auto items-center"--}}
+{{--            x-data="{ count: 1, price: {{ json_encode($price) }}, maxQuantity: {{ json_encode($quantity) }} }"--}}
+{{--            x-init="console.log('Init:', { count, price, maxQuantity }); $watch('price', value => price = Number(value)); $watch('maxQuantity', value => { maxQuantity = Number(value); count = maxQuantity ? 1 : count })"--}}
+{{--        >--}}
+{{--            <h2 class="text-2xl font-extrabold">{{ $product->name }}</h2>--}}
+{{--            <div class="flex gap-4 mt-2 justify-center">--}}
+{{--                <p class="text-2xl font-bold" x-text="price ? '$' + (count * price).toFixed(2) : '${{ number_format($minPrice, 2) }} - ${{ number_format($maxPrice, 2) }}'"></p>--}}
+{{--            </div>--}}
+{{--            <div class="my-2">--}}
+{{--                <button--}}
+{{--                    x-on:click="count = count > 1 ? count - 1 : count"--}}
+{{--                    class="w-5 btn btn-error rounded-md "--}}
+{{--                    :disabled="!price" :disabled="!maxQuantity"--}}
+{{--                >-</button>--}}
+{{--                <span x-text="count" class="px-4"></span>--}}
+{{--                <button--}}
+{{--                    x-on:click="count = count < maxQuantity ? count + 1 : count"--}}
+{{--                    class="w-5 btn btn-success rounded-md"--}}
+{{--                    :disabled="!price" :disabled="!maxQuantity"--}}
+{{--                >+</button>--}}
+{{--            </div>--}}
+{{--            <button--}}
+{{--                class="btn btn-wide btn-lg btn-primary hover:scale-105 text-primary-content"--}}
+{{--                wire:click="processCart({{ $product->id }}, count, count * price)"--}}
+{{--                :disabled="!price"--}}
+{{--            >--}}
+{{--                Add to cart--}}
+{{--            </button>--}}
+{{--        </div>--}}
     </div>
     <div class="divider divider-horizontal"></div>
     <div class="card-body">
@@ -128,7 +305,6 @@ new class extends Component {
         <div class="overflow-x-auto p-5">
             <table class="table table-zebra">
                 <tbody>
-                <!-- row 1 -->
                 <tr>
                     <th>Product ID</th>
                     <td>#00{{$product->id}}</td>
@@ -137,28 +313,21 @@ new class extends Component {
                     <th>Brand</th>
                     <td>{{$product->brand->name}}</td>
                 </tr>
-                <!-- row 2 -->
                 <tr>
                     <th>Category</th>
                     <td>{{$product->cate->name}}</td>
                 </tr>
-                <!-- row 3 -->
-                <tr>
-                    <th>Size</th>
-                    <td>{{$product->size}}</td>
-                </tr>
-                <tr>
-                    <th>Flavor</th>
-                    <td>{{$product->flavor}}</td>
-                </tr>
-                <tr>
-                    <th>Servings</th>
-                    <td>{{$product->servings}}</td>
-                </tr>
                 <tr>
                     <th>Price</th>
-                    <td>${{$product->price}}</td>
+                    <td class="transition-opacity duration-300 ease-in-out" wire:transition>
+                        @if($price)
+                            ${{ number_format($price, 2) }}
+                        @else
+                            ${{ number_format($minPrice, 2) }} - ${{ number_format($maxPrice, 2) }}
+                        @endif
+                    </td>
                 </tr>
+
                 <tr>
                     <th>Rate</th>
                     <td>
@@ -167,107 +336,136 @@ new class extends Component {
                 </tr>
                 </tbody>
             </table>
+            <div class="grid md:grid-rows-2 mt-5">
+                <div>
+                    <p>Choose your desire product</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-12" wire:key="dynamic-selects">
+                    @foreach($filters as $key => $value)
+                        <div>
+                            <fieldset>
+                                <legend class="fieldset-legend">{{ $labels[$key] }}</legend>
+                                <select
+                                    class="select select-primary"
+                                    wire:model.defer="filters.{{ $key }}"
+                                    wire:change="updateOptions"
+                                >
+                                    <option value="">Pick your {{ strtolower($labels[$key]) }}</option>
+                                    @foreach($availableOptions[$key] as $option)
+                                        <option value="{{ $option['name'] }}">{{ $option['name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </fieldset>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
         </div>
         <div class="shadow-sm p-6">
             <h3 class="text-lg font-bold ">Reviews(50)</h3>
             <div class="grid md:grid-cols-2 gap-12 mt-6">
                 <div>
+                    <div class="flex items-start">
+                        <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5404890a-6524-4910-a6cf-f6c74c2a69d7/dh852mv-d7802065-f983-4d9f-843e-755a4fe7b8cd.jpg/v1/fill/w_894,h_894,q_70,strp/jane_doe_by_yinzersteel_dh852mv-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTAyNCIsInBhdGgiOiJcL2ZcLzU0MDQ4OTBhLTY1MjQtNDkxMC1hNmNmLWY2Yzc0YzJhNjlkN1wvZGg4NTJtdi1kNzgwMjA2NS1mOTgzLTRkOWYtODQzZS03NTVhNGZlN2I4Y2QuanBnIiwid2lkdGgiOiI8PTEwMjQifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.Ae1QCCfZST5ZpMX2wo_IyupDqLZWHnCyuWmBVhdQHho" class="w-12 h-12 rounded-full border-2 border-white" />
+                        <div class="ml-3">
+                            <h4 class="text-sm font-bold ">Jane Doe</h4>
+                            <div class="flex space-x-1 mt-1">
+                                <svg class="w-4 fill-primary" viewBox="0 0 14 13" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+                                </svg>
+                                <svg class="w-4 fill-primary" viewBox="0 0 14 13" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+                                </svg>
+                                <svg class="w-4 fill-primary" viewBox="0 0 14 13" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+                                </svg>
+                                <svg class="w-4 fill-[#CED5D8]" viewBox="0 0 14 13" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+                                </svg>
+                                <svg class="w-4 fill-[#CED5D8]" viewBox="0 0 14 13" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+                                </svg>
+                                <p class="text-xs !ml-2 font-semibold ">2 minutes ago</p>
+                            </div>
+                            <p class="text-sm mt-4 ">Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.</p>
+                        </div>
+                    </div>
+{{--                    <button type="button" class="w-full mt-10 px-4 py-2.5 bg-transparent hover:bg-gray-50 border border-[#333]  font-bold rounded">Read all reviews</button>--}}
+                </div>
+                <div>
                     <div class="space-y-3">
                         <div class="flex items-center">
                             <p class="text-sm  font-bold">5.0</p>
-                            <svg class="w-5 fill-[#333] ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="w-5 fill-primary ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                {{--fill-[#333]--}}
                                 <path
                                     d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
                             </svg>
                             <div class="bg-gray-400 rounded w-full h-2 ml-3">
-                                <div class="w-2/3 h-full rounded bg-[#333]"></div>
+                                <div class="w-2/3 h-full rounded bg-primary"></div>
                             </div>
                             <p class="text-sm  font-bold ml-3">69%</p>
                         </div>
                         <div class="flex items-center">
-                            <p class="text-sm  font-bold">4.0</p>
-                            <svg class="w-5 fill-[#333] ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <p class="text-sm font-bold">4.0</p>
+                            <svg class="w-5 fill-primary ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
                             </svg>
                             <div class="bg-gray-400 rounded w-full h-2 ml-3">
-                                <div class="w-1/3 h-full rounded bg-[#333]"></div>
+                                <div class="w-1/3 h-full rounded bg-primary"></div>
                             </div>
                             <p class="text-sm  font-bold ml-3">33%</p>
                         </div>
                         <div class="flex items-center">
                             <p class="text-sm  font-bold">3.0</p>
-                            <svg class="w-5 fill-[#333] ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="w-5 fill-primary ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
                             </svg>
                             <div class="bg-gray-400 rounded w-full h-2 ml-3">
-                                <div class="w-1/6 h-full rounded bg-[#333]"></div>
+                                <div class="w-1/6 h-full rounded bg-primary"></div>
                             </div>
                             <p class="text-sm  font-bold ml-3">16%</p>
                         </div>
                         <div class="flex items-center">
                             <p class="text-sm  font-bold">2.0</p>
-                            <svg class="w-5 fill-[#333] ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="w-5 fill-primary ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
                             </svg>
                             <div class="bg-gray-400 rounded w-full h-2 ml-3">
-                                <div class="w-1/12 h-full rounded bg-[#333]"></div>
+                                <div class="w-1/12 h-full rounded bg-primary"></div>
                             </div>
                             <p class="text-sm  font-bold ml-3">8%</p>
                         </div>
                         <div class="flex items-center">
                             <p class="text-sm  font-bold">1.0</p>
-                            <svg class="w-5 fill-[#333] ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="w-5 fill-primary ml-1" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
                             </svg>
                             <div class="bg-gray-400 rounded w-full h-2 ml-3">
-                                <div class="w-[6%] h-full rounded bg-[#333]"></div>
+                                <div class="w-[6%] h-full rounded bg-primary"></div>
                             </div>
                             <p class="text-sm  font-bold ml-3">6%</p>
                         </div>
                     </div>
                 </div>
-                <div class="">
-                    <div class="flex items-start">
-                        <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" class="w-12 h-12 rounded-full border-2 border-white" />
-                        <div class="ml-3">
-                            <h4 class="text-sm font-bold ">Jane Doe</h4>
-                            <div class="flex space-x-1 mt-1">
-                                <svg class="w-4 fill-[#333]" viewBox="0 0 14 13" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
-                                </svg>
-                                <svg class="w-4 fill-[#333]" viewBox="0 0 14 13" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
-                                </svg>
-                                <svg class="w-4 fill-[#333]" viewBox="0 0 14 13" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
-                                </svg>
-                                <svg class="w-4 fill-[#CED5D8]" viewBox="0 0 14 13" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
-                                </svg>
-                                <svg class="w-4 fill-[#CED5D8]" viewBox="0 0 14 13" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
-                                </svg>
-                                <p class="text-xs !ml-2 font-semibold ">2 seconds ago</p>
-                            </div>
-                            <p class="text-sm mt-4 ">Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.</p>
-                        </div>
-                    </div>
-                    <button type="button" class="w-full mt-10 px-4 py-2.5 bg-transparent hover:bg-gray-50 border border-[#333]  font-bold rounded">Read all reviews</button>
-                </div>
+            </div>
+            <div>
+                <button type="button" class="w-full mt-10 px-4 py-2.5 bg-transparent hover:bg-gray-50 border border-[#333]  font-bold rounded">Read all reviews</button>
             </div>
         </div>
     </div>
