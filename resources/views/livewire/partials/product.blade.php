@@ -7,6 +7,7 @@ new class extends Component {
     use \Mary\Traits\Toast;
     public $prd;
     public $prd_details;
+    public $details_id;
     public $prd_id;
     public $quantity = null;
     public $price = null;
@@ -62,13 +63,13 @@ new class extends Component {
 //            dd($id,$quantity,$total);
             $cart_id = $this->getCartID();
             $totalPrice = $this->price ? $this->count * $this->price : 0;
-            $this->addToCart($cart_id,$id,$this->count,$totalPrice);
+            $this->addToCart($cart_id,$id,$this->details_id,$this->count,$totalPrice);
         }
     }
-    protected function addToCart($cart_id,$product_id,$quantity,$total)
+    protected function addToCart($cart_id,$product_id,$details_id,$quantity,$total)
     {
         // Check if the product already exists in the cart
-        $existingCartItem = \App\Models\CartItems::where('cart_id', $cart_id)
+        $existingCartItem = \App\Models\CartItems::where('order_id', $cart_id)
             ->where('product_id', $product_id)
             ->first();
 
@@ -87,8 +88,9 @@ new class extends Component {
         } else {
             // Product does not exist in the cart, insert a new cart item
             $cartItem = \App\Models\CartItems::create([
-                'cart_id' => $cart_id,
+                'order_id' => $cart_id,
                 'product_id' => $product_id,
+                'product_details_id' => $details_id,
                 'cart_quantity' => $quantity,
                 'subtotal' => $total,
             ]);
@@ -115,7 +117,7 @@ new class extends Component {
 
         // If an order exists, return its cart_id
         if ($order) {
-            return $order->cart_id;
+            return $order->id;
         } else {
             // No order exists, create a new one
             return $this->createOrder($customer_id);
@@ -129,7 +131,7 @@ new class extends Component {
             'customer_id' => $cus_id
         ]);
         // Return the newly created order's cart_id
-        return $order->cart_id;
+        return $order->id;
     }
 
     public function get_product($prd_id)
@@ -167,10 +169,10 @@ new class extends Component {
             if ($filteredDetails->count() == 1) { //When the only product left
                 // Update price based on the filtered result
                 $selectedProduct = $filteredDetails->first(); // Get the first matching product
-//        dd($selectedProduct);
                 $this->price = $selectedProduct ? $selectedProduct->price : null; // Set price or null if no match
                 $this->quantity = $selectedProduct ? $selectedProduct->quantity : null;
-//                dd($this->price,$this->quantity);
+                $this->details_id = $selectedProduct->id;
+//                dd($this->details_id);
             }
 //            dd($this->price,$this->quantity);
         }

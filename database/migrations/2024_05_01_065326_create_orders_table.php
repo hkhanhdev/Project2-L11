@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id('cart_id');
+            $table->id();
             $table->unsignedBigInteger("customer_id")->nullable();
             $table->string("status")->default("in cart");
             $table->unsignedBigInteger("seller_id")->nullable();

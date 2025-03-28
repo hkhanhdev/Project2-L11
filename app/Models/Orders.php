@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class Orders extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'cart_id';
+    protected $primaryKey = 'id';
     protected $fillable = [
         'customer_id',
         'status',
@@ -20,11 +20,11 @@ class Orders extends Model
         'phone'
     ];
     protected $guarded = [
-        'cart_id'
+        'id'
     ];
     public function items()
     {
-        return $this->hasMany(CartItems::class, 'cart_id', 'cart_id');
+        return $this->hasMany(CartItems::class, 'order_id', 'id');
     }
 
     public function customer()

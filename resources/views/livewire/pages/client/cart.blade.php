@@ -108,7 +108,7 @@ class extends Component {
     public function getCartItems()
     {
         $cart_id = $this->getCartID();
-        $cart_items = \App\Models\CartItems::query()->where("cart_id",$cart_id)->get();
+        $cart_items = \App\Models\CartItems::query()->where("order_id",$cart_id)->get();
 //        dd($cart_items);
         return $cart_items;
     }
@@ -120,8 +120,8 @@ class extends Component {
             ->first();
         // If an order exists, return its cart_id
         if ($order) {
-            $this->active_cart_id = $order->cart_id;
-            return $order->cart_id;
+            $this->active_cart_id = $order->id;
+            return $order->id;
         } else {
             // No order exists, create a new one
             return $this->createOrder($this->active_user->id);
@@ -134,9 +134,9 @@ class extends Component {
         $order = \App\Models\Orders::create([
             'customer_id' => $cus_id
         ]);
-        $this->active_cart_id = $order->cart_id;
+        $this->active_cart_id = $order->id;
         // Return the newly created order's cart_id
-        return $order->cart_id;
+        return $order->id;
     }
     public function with():array
     {
@@ -195,10 +195,10 @@ class extends Component {
                                 <td class="w-48">{{$item->product->name}}</td>
                                 <td>{{$item->product->brand->name}}</td>
                                 <td>{{$item->product->cate->name}}</td>
-                                <td>{{$item->product->price}}</td>
-                                <td>{{$item->product->flavor}}</td>
-                                <td>{{$item->product->size}}</td>
-                                <td>{{$item->product->servings}}</td>
+                                <td>{{$item->product_details->price}}</td>
+                                <td>{{$item->product_details->flavor}}</td>
+                                <td>{{$item->product_details->size}}</td>
+                                <td>{{$item->product_details->servings}}</td>
                                 <td>
                                     <div class="flex">
                                         <button class="btn btn-outline btn-error btn-xs" x-on:click="count = count > 1 ? count-1 : count"

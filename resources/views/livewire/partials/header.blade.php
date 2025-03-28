@@ -22,7 +22,7 @@ new class extends Component {
                 ->where('status', 'in cart')
                 ->first();
             if ($order) {
-                $cart_details = \App\Models\CartItems::where('cart_id',$order->cart_id)->get();
+                $cart_details = \App\Models\CartItems::where('order_id',$order->id)->get();
                 return $cart_details;
             } else {
                 return null;

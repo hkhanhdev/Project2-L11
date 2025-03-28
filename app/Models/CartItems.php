@@ -10,8 +10,9 @@ class CartItems extends Model
     use HasFactory;
     public $timestamps = false;
     protected $fillable = [
-        'cart_id',
+        'order_id',
         'product_id',
+        'product_details_id',
         'cart_quantity',
         'subtotal'
     ];
@@ -26,6 +27,10 @@ class CartItems extends Model
 
     public function order()
     {
-        return $this->belongsTo(Orders::class, 'cart_id', 'cart_id');
+        return $this->belongsTo(Orders::class, 'order_id', 'order_id');
+    }
+
+    public function product_details() {
+        return $this->belongsTo(ProductDetails::class, 'product_details_id', 'id');
     }
 }
