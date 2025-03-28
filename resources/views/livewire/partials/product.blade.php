@@ -33,6 +33,14 @@ new class extends Component {
         'servings' => 'Servings',
     ];
 
+    public function reloadOptions() {
+        $this->availableOptions= ['size' => [], 'flavor' => [], 'servings' => []];
+        $this->filters = ['size' => '', 'flavor' => '', 'servings' => ''];
+        $this->quantity = null;
+        $this->price = null;
+        $this->count = 1;
+
+    }
     public function increment()
     {
         if ($this->price && $this->quantity && $this->count < $this->quantity) {
@@ -162,36 +170,13 @@ new class extends Component {
 //        dd($selectedProduct);
                 $this->price = $selectedProduct ? $selectedProduct->price : null; // Set price or null if no match
                 $this->quantity = $selectedProduct ? $selectedProduct->quantity : null;
+//                dd($this->price,$this->quantity);
             }
+//            dd($this->price,$this->quantity);
         }
 
     }
 
-
-
-//    private function initOptions()
-//    {
-//        $this->availableFlavors = $this->prd_details->map(function ($detail) {
-//            return [
-//                'name' => $detail->flavor
-//            ];
-//        });
-//        $this->availableFlavors = collect($this->availableFlavors)->unique('name')->values()->all();
-//
-//        $this->availableSizes = $this->prd_details->map(function ($detail) {
-//            return [
-//                'name' => $detail->size
-//            ];
-//        });
-//        $this->availableSizes = collect($this->availableSizes)->unique('name')->values()->all();
-//
-//        $this->availableServings = $this->prd_details->map(function ($detail) {
-//            return [
-//                'name' => $detail->servings
-//            ];
-//        });
-//        $this->availableServings = collect($this->availableServings)->unique('name')->values()->all();
-//    }
     public function with():array
     {
         $product = $this->get_product($this->prd_id);
@@ -236,8 +221,8 @@ new class extends Component {
             <h2 class="text-2xl font-extrabold">{{ $product->name }}</h2>
             <div class="flex gap-4 mt-2 justify-center">
                 <p class="text-2xl font-bold transition-opacity duration-300 ease-in-out"
-                   wire:transition>
-                    @if($price)
+                   >
+                    @if($price != null)
                         ${{ number_format($count * $price, 2) }}
                     @else
                         ${{ number_format($minPrice, 2) }} - ${{ number_format($maxPrice, 2) }}
@@ -266,36 +251,6 @@ new class extends Component {
                 Add to cart
             </button>
         </div>
-{{--        <div--}}
-{{--            class="mt-6 flex flex-wrap flex-col justify-center mx-auto items-center"--}}
-{{--            x-data="{ count: 1, price: {{ json_encode($price) }}, maxQuantity: {{ json_encode($quantity) }} }"--}}
-{{--            x-init="console.log('Init:', { count, price, maxQuantity }); $watch('price', value => price = Number(value)); $watch('maxQuantity', value => { maxQuantity = Number(value); count = maxQuantity ? 1 : count })"--}}
-{{--        >--}}
-{{--            <h2 class="text-2xl font-extrabold">{{ $product->name }}</h2>--}}
-{{--            <div class="flex gap-4 mt-2 justify-center">--}}
-{{--                <p class="text-2xl font-bold" x-text="price ? '$' + (count * price).toFixed(2) : '${{ number_format($minPrice, 2) }} - ${{ number_format($maxPrice, 2) }}'"></p>--}}
-{{--            </div>--}}
-{{--            <div class="my-2">--}}
-{{--                <button--}}
-{{--                    x-on:click="count = count > 1 ? count - 1 : count"--}}
-{{--                    class="w-5 btn btn-error rounded-md "--}}
-{{--                    :disabled="!price" :disabled="!maxQuantity"--}}
-{{--                >-</button>--}}
-{{--                <span x-text="count" class="px-4"></span>--}}
-{{--                <button--}}
-{{--                    x-on:click="count = count < maxQuantity ? count + 1 : count"--}}
-{{--                    class="w-5 btn btn-success rounded-md"--}}
-{{--                    :disabled="!price" :disabled="!maxQuantity"--}}
-{{--                >+</button>--}}
-{{--            </div>--}}
-{{--            <button--}}
-{{--                class="btn btn-wide btn-lg btn-primary hover:scale-105 text-primary-content"--}}
-{{--                wire:click="processCart({{ $product->id }}, count, count * price)"--}}
-{{--                :disabled="!price"--}}
-{{--            >--}}
-{{--                Add to cart--}}
-{{--            </button>--}}
-{{--        </div>--}}
     </div>
     <div class="divider divider-horizontal"></div>
     <div class="card-body">
@@ -319,8 +274,8 @@ new class extends Component {
                 </tr>
                 <tr>
                     <th>Price</th>
-                    <td class="transition-opacity duration-300 ease-in-out" wire:transition>
-                        @if($price)
+                    <td class="transition-opacity duration-300 ease-in-out" >
+                        @if($price != null)
                             ${{ number_format($price, 2) }}
                         @else
                             ${{ number_format($minPrice, 2) }} - ${{ number_format($maxPrice, 2) }}
@@ -336,10 +291,7 @@ new class extends Component {
                 </tr>
                 </tbody>
             </table>
-            <div class="grid md:grid-rows-2 mt-5">
-                <div>
-                    <p>Choose your desire product</p>
-                </div>
+            <div class="grid sm:grid-rows-2 mt-5 gap-5">
                 <div class="grid md:grid-cols-3 gap-12" wire:key="dynamic-selects">
                     @foreach($filters as $key => $value)
                         <div>
@@ -359,6 +311,7 @@ new class extends Component {
                         </div>
                     @endforeach
                 </div>
+                <x-ui-button label="Reset options" wire:click="reloadOptions" icon-right="c-arrow-path" spinner class="btn-warning" />
             </div>
 
         </div>
