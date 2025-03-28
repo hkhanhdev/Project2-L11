@@ -33,7 +33,7 @@ class Products extends Model
         return $this->hasMany(CartItems::class, 'product_id', 'id');
     }
 
-    }
+    
 
 
 }
