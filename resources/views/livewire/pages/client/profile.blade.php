@@ -170,12 +170,12 @@ class extends Component {
                             <div class="card card-side bg-gray-200 shadow-sm rounded-full">
                                 <div class="card-body">
                                     <div class="flex justify-between items-center">
-                                        <span class="font-semibold">ID:##{{$order->cart_id}}</span>
+                                        <span class="font-semibold">ID:##{{$order->id}}</span>
                                         <span class="font-semibold">Number of items:{{$order->items?$order->items->count() : 0}}</span>
                                         <span class="font-semibold">Total:${{$order->items?$order->items->sum('subtotal') : 0}}</span>
                                         @if($order->status == 'pending')
                                             <span class="font-semibold">Status:<span class="badge badge-warning">Pending</span></span>
-                                            <button class="btn btn-error" wire:click="openCancelModal({{$order->cart_id}})">Cancel order</button>
+                                            <button class="btn btn-error" wire:click="openCancelModal({{$order->id}})">Cancel order</button>
                                         @elseif($order->status == 'delivering')
                                             <span class="font-semibold">Status:<span class="badge badge-info">Delivering</span></span>
 {{--                                            <button class="btn btn-error btn-disabled">Cancel order</button>--}}
@@ -189,7 +189,7 @@ class extends Component {
                                             <span class="font-semibold">Status:<span class="badge badge-error">Canceled</span></span>
 {{--                                            <button class="btn btn-error btn-disabled">Cancel order</button>--}}
                                         @endif
-                                        <button class="btn btn-primary" wire:click="viewDetails({{$order->cart_id}})" wire:loading.class="loading loading-spin">View Details</button>
+                                        <button class="btn btn-primary" wire:click="viewDetails({{$order->id}})" wire:loading.class="loading loading-spin">View Details</button>
                                     </div>
                                 </div>
                             </div>
@@ -225,7 +225,7 @@ class extends Component {
                             <tbody>
                                 @if($order_info != null)
                                     <tr class="bg-base-200">
-                                        <td>{{$order_info->cart_id}}</td>
+                                        <td>{{$order_info->id}}</td>
                                         <th>Product name</th>
                                         <th>Quantity</th>
                                         <th>Subtotal</th>
